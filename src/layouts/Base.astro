@@ -41,6 +41,8 @@ const ld = schema.map((s) => JSON.stringify({ "@context": "https://schema.org", 
     {noindex ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonical} />}
     {markdown && <link rel="alternate" type="text/markdown" href={markdown} title="This page as Markdown" />}
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
     <!-- Both fonts before the first paint: global.css never swaps one in late. -->
     <link rel="preload" href="/fonts/inter.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/fonts/jetbrains-mono.woff2" as="font" type="font/woff2" crossorigin />
