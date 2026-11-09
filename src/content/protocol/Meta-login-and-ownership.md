@@ -78,6 +78,8 @@ The change-owner flow runs in this order. The phone opens one channel on svc36 a
 | Finish change owner request | 8196 (0x2004) | Phone to glasses | Final receipt from Meta |
 | Finish change owner response | 8197 (0x2005) | Glasses to phone | Empty acknowledgement |
 
+Some glasses ack the skip challenge and still answer the start change owner request only after a press of their button. Audio-only orca glasses do this. The phone waits for the answer and asks the person to press the button.
+
 The hardware calls run between those messages:
 
 1. `pair_request` is a form POST to `graph.facebook-hardware.com/pair_request`, gzip compressed. Its fields are `access_token` (HW app token), `user_access_token` (ARAe), `user_token_universe` (`ar`), `pair_protocol_version` (`4`), `device_cert` (base64 of the device certificate), `serial_number` and `additional_data`. The last is JSON text with `device_nonce` (base64 of the nonce from the skip challenge), `app_pubkey` (base64 of the phone's 64-byte public key) and `secondary_cert`. `secondary_cert` is empty for glasses. For the Neural Band it is base64 of field 5 of the identity response, and without it `pair` answers HTTP 500.

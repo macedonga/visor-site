@@ -37,14 +37,17 @@ sequenceDiagram
 
 ### The audio framing on s0
 
-Each s0 chunk holds one or more Opus packets in one of two layouts. The phone tells them apart by the first four bytes. Read as big-endian, a little-endian length is far larger than the chunk.
+Each s0 chunk holds one or more Opus packets in one of three layouts. The phone tells them apart by the first four bytes. Read as big-endian, a little-endian length is far larger than the chunk.
 
 | Layout | Bytes | Used for |
 |---|---|---|
 | Timed record | `[u32 LE len][u32 LE ms][u32 BE opus len][u32 BE range][opus]` | Follow-ups and Hey Meta turns, with a time on the glasses' clock |
 | Bare record | `[u32 BE len][opus]` | Italian questions, with no time |
+| Grouped record | `[u32 LE len][u32 LE ms][5 bytes]`, then `[u32 LE opus len][opus]` up to `len` | Audio-only glasses (orca) |
 
 Offsets in a timed record: the Opus length is at byte 8, the range at byte 12, and the packet starts at byte 16. A bare record starts its packet at byte 4.
+
+In a grouped record, `len` counts the bytes after itself. The five bytes after the time are `01 00 00 00 00` in every record seen and are not decoded. The first packet length is at byte 13. The packets seen from orca are 40 bytes long and start with TOC byte `0xb8`, 20 ms of CELT wideband audio. The phone takes a record as grouped when its byte 8, read as a timed record's Opus length, does not fit the chunk.
 
 ## Photos for questions about the view
 
