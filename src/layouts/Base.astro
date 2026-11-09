@@ -9,9 +9,27 @@ interface Props {
   world: "night" | "blueprint";
   image?: string;
   section?: "visor" | "developers" | "docs" | "protocol";
+  type?: "website" | "article";
+  /** The page as Markdown, announced to agents. */
+  markdown?: string;
+  /** Schema.org objects for search engines, as JSON-LD. */
+  schema?: object[];
+  /** Kept out of search results, without a canonical address: the 404 page. */
+  noindex?: boolean;
 }
-const { title, description, world, image = world === "night" ? "/social/visor.png" : "/social/vdk.png", section = "visor" } = Astro.props;
+const {
+  title, description, world, image = world === "night" ? "/social/visor.png" : "/social/vdk.png", section = "visor",
+  type = "website", markdown, schema = [], noindex = false,
+} = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
+// The social images, all 1280 by 640.
+const IMAGE_ALT: Record<string, string> = {
+  "/social/visor.png": "Visor: a de-metaified Meta Glasses client.",
+  "/social/vdk.png": "Visor Development Kit: build your own apps for Meta glasses.",
+};
+const imageAlt = IMAGE_ALT[image];
+// "<" escaped, so no text inside can close the script element.
+const ld = schema.map((s) => JSON.stringify({ "@context": "https://schema.org", ...s }).replace(/</g, "\\u003c"));
 ---
 <!doctype html>
 <html lang="en" data-world={world}>
@@ -20,18 +38,28 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
-    <link rel="canonical" href={canonical} />
+    {noindex ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonical} />}
+    {markdown && <link rel="alternate" type="text/markdown" href={markdown} title="This page as Markdown" />}
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <!-- Both fonts before the first paint: global.css never swaps one in late. -->
     <link rel="preload" href="/fonts/inter.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/fonts/jetbrains-mono.woff2" as="font" type="font/woff2" crossorigin />
     <meta name="theme-color" content={world === "night" ? "#000000" : "#ffffff"} />
-    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Visor" />
+    <meta property="og:type" content={type} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:url" content={canonical} />
+    {!noindex && <meta property="og:url" content={canonical} />}
     <meta property="og:image" content={new URL(image, Astro.site)} />
+    {imageAlt && (
+      <>
+        <meta property="og:image:width" content="1280" />
+        <meta property="og:image:height" content="640" />
+        <meta property="og:image:alt" content={imageAlt} />
+      </>
+    )}
     <meta name="twitter:card" content="summary_large_image" />
+    {ld.map((json) => <script type="application/ld+json" set:html={json} />)}
   </head>
   <body class="overflow-x-hidden bg-bg font-sans text-ink antialiased">
     <a href="#main" class="absolute -top-12 left-3 z-50 bg-accent px-3 py-2 font-semibold text-accent-ink focus:top-3">Skip to content</a>

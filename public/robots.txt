@@ -1,0 +1,6 @@
+# Every page is open to search engines and AI agents.
+# Agents: https://visor.macedonga.com/llms.txt lists every page as Markdown.
+User-agent: *
+Allow: /
+
+Sitemap: https://visor.macedonga.com/sitemap.xml

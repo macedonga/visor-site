@@ -1,5 +1,6 @@
 import { getCollection, type CollectionEntry } from "astro:content";
 import { sidebar, titleOfPage, hrefOfPage } from "./protocol.mjs";
+import { describe } from "./describe";
 
 export type Page = CollectionEntry<"protocol">;
 
@@ -23,10 +24,7 @@ export async function groups() {
   return listed;
 }
 
-/** The first paragraph, as plain text, for the page's description. */
-export function summaryOf(page: Page): string {
-  const para = (page.body ?? "").split(/\n\s*\n/).map((p) => p.trim()).find((p) => p && !/^[#>|`<-]/.test(p)) ?? "";
-  return para.replace(/`([^`]+)`/g, "$1").replace(/\[([^\]]+)\]\([^)]+\)/g, "$1").replace(/[*_]/g, "").replace(/\s+/g, " ").slice(0, 200);
-}
+/** The first paragraph's opening sentences, for the page's description. */
+export const summaryOf = (page: Page, max = 200) => describe(page.body ?? "", max);
 
 export { titleOfPage, hrefOfPage };

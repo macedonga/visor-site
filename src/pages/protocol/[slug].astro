@@ -3,6 +3,7 @@ import { render } from "astro:content";
 import Docs from "../../layouts/Docs.astro";
 import { pages, groups, nameOf, summaryOf, titleOfPage, hrefOfPage } from "../../lib/protocol-book";
 import { docsFor } from "../../lib/related";
+import { modified } from "../../lib/describe";
 import { allDocs, slugOf, titleOf, hrefOf } from "../../lib/docs";
 
 export async function getStaticPaths() {
@@ -23,6 +24,7 @@ const at = flat.findIndex((i) => i.href === hrefOfPage(name));
 <Docs
   title={titleOfPage(name)}
   description={summaryOf(page)}
+  modified={modified(page.filePath)}
   section="protocol"
   groups={all}
   current={hrefOfPage(name)}

@@ -4,6 +4,8 @@ import VMark from "../components/VMark.astro";
 
 const RELEASES = "https://github.com/macedonga/visor/releases/latest";
 const REPO = "https://github.com/macedonga/visor";
+const SITE = "https://visor.macedonga.com/";
+const DESCRIPTION = "An open Android app for Ray-Ban Meta, Oakley Meta and the Meta Ray-Ban Display. Your photos stay on your phone, and 'Hey Meta' answers with the model you choose.";
 
 const features = [
   ["Home", "Your pair in 3D, both batteries, storage and the latest photos."],
@@ -34,8 +36,16 @@ const pill = "inline-flex h-11 items-center rounded-full px-5 text-[15px] font-m
 ---
 <Base
   title="Visor: Meta glasses without the Meta AI app"
-  description="An open Android app for Ray-Ban Meta, Oakley Meta and the Meta Ray-Ban Display. Your photos stay on your phone, and 'Hey Meta' answers with the model you choose."
+  description={DESCRIPTION}
   world="night"
+  schema={[
+    { "@type": "WebSite", name: "Visor", url: SITE },
+    {
+      "@type": "SoftwareApplication", name: "Visor", description: DESCRIPTION, url: SITE, applicationCategory: "UtilitiesApplication",
+      operatingSystem: "Android 12 or later", downloadUrl: RELEASES, license: "https://www.gnu.org/licenses/agpl-3.0.html",
+      offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+    },
+  ]}
 >
   <section class="relative overflow-hidden px-4 pt-24 pb-28 text-center md:pt-40 md:pb-44">
     <!-- One beam from above, as on Visor's banner. -->

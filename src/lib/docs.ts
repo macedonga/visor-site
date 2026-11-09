@@ -1,4 +1,5 @@
 import { getCollection, type CollectionEntry } from "astro:content";
+import { describe } from "./describe";
 
 export type Doc = CollectionEntry<"vdk">;
 
@@ -34,11 +35,11 @@ export function titleOf(doc: Doc): string {
   return match ? match[1].trim() : doc.id;
 }
 
-/** The first paragraph after the title, as plain text, for the page's description. */
-export function summaryOf(doc: Doc): string {
-  const body = (doc.body ?? "").replace(/^#.*$/m, "");
-  const para = body.split(/\n\s*\n/).map((p) => p.trim()).find((p) => p && !/^[#>|`<-]/.test(p)) ?? "";
-  return para.replace(/`([^`]+)`/g, "$1").replace(/\[([^\]]+)\]\([^)]+\)/g, "$1").replace(/[*_]/g, "").replace(/\s+/g, " ").slice(0, 200);
+/** The page's description. A page that opens with its scope, or says little first, leads with the README's line. */
+export function summaryOf(doc: Doc, blurb = ""): string {
+  const body = doc.body ?? "";
+  const own = describe(body);
+  return /^Scope:/.test(body.split(/\n\s*\n/)[1]?.trim() ?? "") || own.length < 60 ? describe(body, 200, blurb) : own;
 }
 
 export async function allDocs(): Promise<Doc[]> {

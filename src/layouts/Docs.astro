@@ -18,19 +18,42 @@ interface Props {
   markdown?: string;
   /** Pages of the other book about the same thing, and how to name them. */
   related?: { lead: string; items: Item[] };
+  /** When the page's source last changed, as an ISO date. */
+  modified?: string;
 }
-const { title, description, section, groups, current, headings = [], previous, next, source, markdown, related } = Astro.props;
+const { title, description, section, groups, current, headings = [], previous, next, source, markdown, related, modified } = Astro.props;
 const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
-// The two books, named and told apart at the top of every sidebar.
+// The two books, named and told apart at the top of every sidebar. A page's title ends with its book's `suffix`.
 const BOOKS = [
-  { section: "docs", href: "/developers/docs/", name: "VDK docs", what: "Build apps that use the glasses" },
-  { section: "protocol", href: "/protocol/", name: "Protocol", what: "How the glasses talk to the phone" },
+  { section: "docs", href: "/developers/docs/", name: "VDK docs", what: "Build apps that use the glasses", suffix: "Visor VDK docs" },
+  { section: "protocol", href: "/protocol/", name: "Protocol", what: "How the glasses talk to the phone", suffix: "Meta glasses protocol" },
 ];
-const book = BOOKS.find((b) => b.section === section)!.name;
+const here = BOOKS.find((b) => b.section === section)!;
+const book = here.name;
+const front = current === here.href;
+
+// For search engines: where the page sits, and what it is.
+const url = (href: string) => new URL(href, Astro.site).href;
+const trail = [
+  { name: "Visor", href: "/" },
+  ...(section === "docs" ? [{ name: "Developers", href: "/developers/" }] : []),
+  { name: book, href: here.href },
+  ...(front ? [] : [{ name: title, href: current }]),
+];
+const schema: object[] = [
+  { "@type": "BreadcrumbList", itemListElement: trail.map((c, i) => ({ "@type": "ListItem", position: i + 1, name: c.name, item: url(c.href) })) },
+];
+if (!front) {
+  schema.push({
+    "@type": "TechArticle", headline: title, description, url: url(current), inLanguage: "en",
+    ...(modified && { dateModified: modified }), isPartOf: { "@type": "WebSite", name: "Visor", url: url("/") },
+  });
+}
 const rule = "-ml-px block border-l border-transparent pl-3 hover:text-ink";
 const noBar = "[scrollbar-width:none] [&::-webkit-scrollbar]:hidden";
 ---
-<Base title={`${title} | Visor ${book}`} description={description} world="blueprint" section={section}>
+<Base title={front ? `${title} | Visor` : `${title} | ${here.suffix}`} description={description} world="blueprint" section={section}
+  type={front ? "website" : "article"} markdown={markdown} schema={schema}>
   <div class="mx-auto grid max-w-6xl items-start gap-x-10 px-4 sm:px-6 md:grid-cols-[12rem_minmax(0,1fr)] xl:grid-cols-[12rem_minmax(0,1fr)_11rem]">
     <nav id="book-sidebar" aria-label={book} class:list={["border-b border-line md:sticky md:top-15 md:max-h-[calc(100dvh-3.75rem)] md:overflow-y-auto md:border-0 md:py-8", noBar]}>
       <button type="button" aria-expanded="true" aria-controls="book-nav" data-menu

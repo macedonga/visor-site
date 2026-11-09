@@ -1,8 +1,9 @@
 ---
 import { render } from "astro:content";
 import Docs from "../../../layouts/Docs.astro";
-import { allDocs, slugOf, titleOf, summaryOf, nav, neighbours, hrefOf } from "../../../lib/docs";
+import { allDocs, slugOf, titleOf, summaryOf, nav, neighbours, hrefOf, blurbs } from "../../../lib/docs";
 import { protocolFor } from "../../../lib/related";
+import { modified } from "../../../lib/describe";
 
 export async function getStaticPaths() {
   const docs = await allDocs();
@@ -13,10 +14,12 @@ const { doc } = Astro.props;
 const { Content, headings } = await render(doc);
 const slug = slugOf(doc);
 const { previous, next } = await neighbours(slug);
+const blurb = (await blurbs()).get(slug);
 ---
 <Docs
   title={titleOf(doc)}
-  description={summaryOf(doc)}
+  description={summaryOf(doc, blurb)}
+  modified={modified(doc.filePath)}
   section="docs"
   groups={await nav()}
   current={hrefOf(slug)}

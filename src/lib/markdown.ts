@@ -27,6 +27,13 @@ export async function llmsIndex(): Promise<string> {
     "",
     `Every page is Markdown at the address below. All the VDK docs in one file: ${SITE}/llms-full.txt`,
     "",
+    "## Visor, the app",
+    "",
+    `- [Visor](${SITE}/): what the app does, every place it connects to, and how to install it.`,
+    "- [Download](https://github.com/macedonga/visor/releases/latest): the APK, with a .sha256 file to check it against.",
+    "  Needs Android 12 or later, a Meta account for setup, and an API key for the assistant.",
+    "- [Source](https://github.com/macedonga/visor): Visor is AGPL-3.0, the VDK Apache-2.0.",
+    "",
   ];
   for (const group of await nav()) {
     lines.push(`## VDK docs: ${group.title}`, "");
@@ -41,7 +48,7 @@ export async function llmsIndex(): Promise<string> {
     lines.push(`## Protocol: ${group.title}`, "");
     for (const item of group.items) {
       const page = all.find((p) => `/protocol/${nameOf(p).toLowerCase()}/` === item.href)!;
-      lines.push(`- [${item.title}](${protocolUrl(nameOf(page))}): ${summaryOf(page).slice(0, 140)}`);
+      lines.push(`- [${item.title}](${protocolUrl(nameOf(page))}): ${summaryOf(page, 140)}`);
     }
     lines.push("");
   }
