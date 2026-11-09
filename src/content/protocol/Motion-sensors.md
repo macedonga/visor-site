@@ -68,6 +68,8 @@ A batch is `{1 repeated channel samples}`:
 
 The accelerometer reads m/s^2: about 9.8 on the axis that points down. The accelerometer and the gyroscope share their timestamps. The magnetometer keeps times of its own. The glasses send no orientation: a phone that wants one fuses the three sensors, for example with Madgwick's filter.
 
+Ray-Ban Meta (Gen 2) runs the same daemon. Its sensors sit in the temple: worn, x points down, y backward and z to the wearer's left. It sends no magnetometer readings, so a fused heading drifts. Measured 2026-11-09, at 30 and 60 samples a second.
+
 ## Speech
 
 With `"tts": {"enabled": true}` among the sensors of the configuration, the daemon's speech provider plays text through the glasses' earcon service, in the voice of their assistant. Nothing is recorded, and no recording needs to run.

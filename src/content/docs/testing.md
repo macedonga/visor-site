@@ -324,8 +324,9 @@ there clicks, and a double tap goes back.
 
 ## The samples
 
-- `samples/android` is an app with a button for every capability. Build it with `./gradlew :sample:installDebug`,
-  and use it with `visor trace` to see a whole exchange.
+- `samples/android` is VDK Lab, an app with a tab for each part of the VDK: the glasses, motion, the camera, voice,
+  the assistant, settings, and the Display and band. Build it with `./gradlew :sample:installDebug`, and use it with
+  `visor trace` to see a whole exchange.
 - `samples/python` holds small scripts on the Python client: a teleprompter pager turned by the band, a journal of
   the assistant's answers, and the glasses' settings.
 - `samples/web` is a glasses console in one page, on the network door, with no build step.

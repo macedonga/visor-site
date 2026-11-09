@@ -27,7 +27,7 @@ The wearer looks at a card for a second, through a screen that adds light to the
 
 ## Recipes
 
-The recipes are in the Android sample (`samples/android`, `Cards.kt`), behind its Briefing buttons.
+The recipes are in VDK Lab, the Android sample (`samples/android`, `Cards.kt`), on its Display and band tab.
 
 ### Weather, as Meta's
 

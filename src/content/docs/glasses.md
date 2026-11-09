@@ -126,6 +126,10 @@ Motion needs the `motion` scope. The rate is one of 5, 10, 15, 24, 30 or 60 samp
 
 The axes are Android's, in the sensor's frame. A sensor the glasses did not read for a sample is null.
 
+On Ray-Ban Meta (Gen 2), worn, the sensor's x axis points down, y backward and z to the wearer's left. It has no
+magnetometer: `magnetometer` stays null and the heading in `orientation` drifts. VDK Lab, the Android sample, turns
+`orientation` into the head's pitch, roll and heading this way.
+
 In a test, wait for `fake.glasses.motionRate` to be set, then send readings with `fake.glasses.motion(ax, ay, az)`
 or a whole `MotionSample` with `fake.glasses.motion(sample)`.
 
