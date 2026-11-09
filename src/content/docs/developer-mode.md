@@ -1,6 +1,11 @@
 # Developer mode
 
-Developer mode lets other apps, automations and the launcher work the glasses' camera through Visor. They can take a photo, start and stop a video, import a capture, hear about new captures, and get the Live view's picture.
+> [!NOTE]
+> New apps use the [VDK](getting-started.md): it does all of this and more, and the person grants each app its own
+> scopes. Developer mode's intents are for automation apps, such as Tasker or MacroDroid, that can only send
+> intents, and they keep working. The switch also opens the socket the [`visor` command](testing.md#install) uses.
+
+Developer mode lets automations and the launcher work the glasses' camera through Visor. They can take a photo, start and stop a video, import a capture, hear about new captures, and get the Live view's picture.
 
 ## Turn it on
 

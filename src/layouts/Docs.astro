@@ -32,7 +32,7 @@ const noBar = "[scrollbar-width:none] [&::-webkit-scrollbar]:hidden";
 ---
 <Base title={`${title} | Visor ${book}`} description={description} world="blueprint" section={section}>
   <div class="mx-auto grid max-w-6xl items-start gap-x-10 px-4 sm:px-6 md:grid-cols-[12rem_minmax(0,1fr)] xl:grid-cols-[12rem_minmax(0,1fr)_11rem]">
-    <nav aria-label={book} class:list={["border-b border-line md:sticky md:top-15 md:max-h-[calc(100dvh-3.75rem)] md:overflow-y-auto md:border-0 md:py-8", noBar]}>
+    <nav id="book-sidebar" aria-label={book} class:list={["border-b border-line md:sticky md:top-15 md:max-h-[calc(100dvh-3.75rem)] md:overflow-y-auto md:border-0 md:py-8", noBar]}>
       <button type="button" aria-expanded="true" aria-controls="book-nav" data-menu
         class="group flex h-12 w-full items-center justify-between font-medium md:hidden">
         {book} menu
@@ -62,6 +62,26 @@ const noBar = "[scrollbar-width:none] [&::-webkit-scrollbar]:hidden";
         ))}
       </div>
     </nav>
+    <!-- Inline, so it runs before the first paint: the sidebar keeps its scroll from page to page, and the current
+         page shows even when it is further down. -->
+    <script is:inline>
+      (() => {
+        const nav = document.getElementById("book-sidebar");
+        try {
+          const saved = sessionStorage.getItem("sidebar-scroll");
+          if (saved) nav.scrollTop = Number(saved);
+        } catch {}
+        const here = nav.querySelector('[aria-current="page"]');
+        if (here && nav.scrollHeight > nav.clientHeight) {
+          const item = here.getBoundingClientRect();
+          const box = nav.getBoundingClientRect();
+          if (item.top < box.top || item.bottom > box.bottom) nav.scrollTop += item.top - box.top - box.height / 3;
+        }
+        addEventListener("pagehide", () => {
+          try { sessionStorage.setItem("sidebar-scroll", String(nav.scrollTop)); } catch {}
+        });
+      })();
+    </script>
 
     <div class="min-w-0 py-8 md:py-12">
       <article data-pagefind-body data-pagefind-meta={`section:${book}`}
