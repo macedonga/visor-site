@@ -13,6 +13,8 @@ People update Visor and your app at different times, so the VDK promises that ei
 
 ## Versions
 
+- **Visor 3.0.0** is the first Visor with the VDK. With an older Visor, `Visor.connect` fails with `visor_too_old`,
+  saying Visor has no VDK service, and the network door and `visor` command find nothing to talk to.
 - **Library versions** (`kit`, `kit-protocol`, `kit-testing`) follow semantic versioning.
 - **The protocol version** (`KitProtocol.VERSION`) is one number that each release adding a method, topic, feed or
   field raises by one. It only goes up. Each method, topic and feed records the version that added it in `since`.

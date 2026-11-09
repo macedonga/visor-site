@@ -4,8 +4,9 @@ This guide takes an Android app from nothing to a photo taken with the glasses.
 
 ## 1. Prepare the phone
 
-Install [Visor](https://github.com/macedonga/visor) and set up the glasses in it. Nothing else: your app asks the
-person for what it needs, on Visor's consent screen.
+Install [Visor](https://github.com/macedonga/visor) 3.0.0 or later, the first Visor with the VDK, and set up the
+glasses in it. Nothing else: your app asks the person for what it needs, on Visor's consent screen. With an older
+Visor, `Visor.connect` fails with `visor_too_old`.
 
 ## 2. Add the library
 
@@ -13,8 +14,8 @@ The VDK needs Android 8.0 (API 26) or later in your app. Visor itself runs on An
 
 ```kotlin
 dependencies {
-    implementation("com.macedonga.visor:kit:0.1.0")
-    testImplementation("com.macedonga.visor:kit-testing:0.1.0")
+    implementation("com.macedonga.visor:kit:0.1.1")
+    testImplementation("com.macedonga.visor:kit-testing:0.1.1")
 }
 ```
 
