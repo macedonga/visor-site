@@ -1,4 +1,4 @@
-The Meta Ray-Ban Display runs web apps in its own browser (`SmartglassBrowserRelease`). The phone keeps their list, opens them, and serves the phone side of the browser's web-app SDK: the phone's sensors, a location check, and Bluetooth scans.
+The Meta Ray-Ban Display runs web apps in its own browser (`SmartglassBrowserRelease`). The phone keeps their list and serves the phone side of the browser's web-app SDK: the phone's sensors, a location check, and Bluetooth scans.
 
 ## The list and opening an app
 
@@ -19,7 +19,12 @@ svc55074 (`smartglass_browser`) carries both directions. Its message types, from
 | 19 | BLE scan stop | Display to phone |
 | 20 | BLE scan start answer | phone to Display |
 
-The list lives in the setting `partner_app_settings`, field 3: a map from a key (`dev_mode_web_app_N` for apps added by hand) to `DisplayConfig {1 Item {1 title, 2 icon}, 2 url, 3 signed manifest}`. Manage apps has the actions 1 create, 2 delete, 3 list, 4 update, 5 open and 6 developer-mode status. To open an app, the phone takes a lease on the browser (svc56, feature 19), waits for its lifecycle, then sends manage with action 5, a name and a URL.
+The list lives in the setting `partner_app_settings`, field 3: a map from a key (`dev_mode_web_app_N` for apps added by hand) to `DisplayConfig {1 Item {1 title, 2 icon}, 2 url, 3 signed manifest}`. Manage apps has the actions 1 create, 2 delete, 3 list, 4 update, 5 open and 6 developer-mode status. The browser's `WebAppRsmService` takes action 5, open, and starts its `WebAppActivity` with the URL and name. The Meta app defines the action and never sends it, and MobileConfig `web_on_hn.webapp_open_on_glasses` is off. Visor tried it, and it does not work from the phone:
+
+- The service runs only under a lease on svc56, feature 19, which the remote service manager in `system_server` binds. Its `onBind` returns no binder, so the lease never reports bound. A client that keeps its lease gets no answer to the next request ("already holds lease"), and the service is not bound again.
+- `onBind` registers svc55074 on the browser's DataX connection, and only while `web_on_hn.web_app_connections` is on. Once Android freezes the browser in the background, that connection closes. The service is not registered again, and each open gets `service_not_found: smartglass_browser (55074)`, status 0xC001.
+- Open requests that did reach the browser opened nothing on the Display. The browser has no `START_ACTIVITIES_FROM_BACKGROUND`, so Android probably blocks its activity start. Not confirmed: the logs had rolled over.
+- An SNIntent on svc28 is no way round: an action outside its fixed list goes out as a broadcast, not an activity start.
 
 ## The web-app SDK
 
@@ -94,5 +99,6 @@ ev57 field 54 names the tools but gives no description or schema. Visor asks the
 
 ## Open questions
 
+- A way to open a web app on the Display from the phone.
 - The answer formats of agent tasks, screenshots, text injection and input focus.
 - Whether the glasses answer MCP `tools/list` on ev311, and how field 54 names a web app's tools.
