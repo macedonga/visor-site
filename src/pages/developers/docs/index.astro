@@ -1,0 +1,34 @@
+---
+import Docs from "../../../layouts/Docs.astro";
+import { nav, blurbs } from "../../../lib/docs";
+
+const groups = await nav();
+const about = await blurbs();
+---
+<Docs
+  title="Visor Development Kit documentation"
+  description="Guides and reference for the Visor Development Kit: Android, Python, TypeScript, JSON-RPC and web apps on the Display."
+  section="docs"
+  groups={groups}
+  current="/developers/docs/"
+>
+  <h1>VDK docs</h1>
+  <p class="lead">Build Android apps, scripts, AI agents and web apps on the Display that use Meta glasses through Visor.</p>
+  <div class="not-prose">
+    {groups.map((g) => (
+      <section class="mt-10">
+        <h2 class="mb-2 text-sm font-semibold">{g.title}</h2>
+        <ul class="m-0 list-none border-t border-line p-0">
+          {g.items.map((i) => (
+            <li class="border-b border-line">
+              <a href={i.href} class="group grid gap-x-6 gap-y-0.5 py-3 sm:grid-cols-[14rem_1fr]">
+                <span class="font-medium group-hover:text-accent">{i.title}</span>
+                <span class="text-sm text-muted">{about.get(i.slug) ?? ""}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))}
+  </div>
+</Docs>

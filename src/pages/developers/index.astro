@@ -1,0 +1,185 @@
+---
+import Base from "../../layouts/Base.astro";
+import WaysIn from "../../components/WaysIn.astro";
+import CodeTabs from "../../components/CodeTabs.astro";
+import { Code } from "astro:components";
+
+const KIT = "https://github.com/macedonga/visor-kit";
+const doc = (slug: string) => `/developers/docs/${slug}/`;
+const themes = { light: "github-light", dark: "github-dark-dimmed" } as const;
+
+const card = `
+visor.display.cards.set("pasta", "Kitchen timer", LayoutIconName.CLOCK) {
+    header(LayoutIconName.CLOCK, "Kitchen timer")
+    stat("4:00", "Pasta")
+    progress(0.6)
+    detail {
+        field("Started", "19:42")
+        field("Ends", "19:52")
+        buttons { button("stop", "Stop") { toast = "Stopped" } }
+    }
+}`;
+
+const tabs = [
+  {
+    label: "Kotlin",
+    lang: "kotlin",
+    code: `
+val visor = Visor.connect(context)
+
+val ask = registerForActivityResult(RequestScopes()) { held -> /* the scopes the app holds now */ }
+ask.launch(setOf(Scope.CAMERA, Scope.BAND))
+
+visor.band.gestures.collect { gesture ->
+    if (gesture.derived == GestureAction.DOUBLE_TAP) visor.camera.takePhoto()
+}`,
+    note: `<code>com.macedonga.visor:kit</code>. <a href="${doc("getting-started")}">Getting started</a>`,
+  },
+  {
+    label: "Python",
+    lang: "python",
+    code: `
+async with await visor_kit.connect_adb() as visor:
+    print(await visor.call("glasses.status"))
+    async for gesture in visor.subscribe("band.gestures"):
+        print(gesture["finger"], gesture["derived"])`,
+    note: `<code>pip install visor-kit</code>. <a href="${doc("network")}">The network door</a>`,
+  },
+  {
+    label: "TypeScript",
+    lang: "ts",
+    code: `
+const visor = await Visor.connect("ws://192.168.1.20:7333/rpc", token);
+visor.subscribe("band.gestures", {}, (gesture) => console.log(gesture));`,
+    note: `<code>npm install visor-kit</code>. <a href="${doc("json-rpc")}">JSON-RPC</a>`,
+  },
+  {
+    label: "Web app",
+    lang: "ts",
+    code: `
+import { Visor, onGlasses } from "visor-kit";
+
+if (onGlasses()) {
+  const visor = await Visor.connectGlasses();
+  await visor.call("voice.speak", { text: "Hello from the web app" });
+}`,
+    note: `Runs in the Display's browser. <a href="${doc("web-apps")}">Web apps on the Display</a>`,
+  },
+];
+
+const areas = [
+  ["Glasses", "glasses.*", "glasses", "Status, every pair, motion, touches and presses."],
+  ["Camera", "camera.*", "camera-and-captures", "Photos into the gallery, videos, the live camera, imports."],
+  ["Display", "display.*", "display", "Layouts and their clicks, Briefing cards, the teleprompter."],
+  ["Neural Band", "band.*", "neural-band", "Gestures, wrist motion and vibration."],
+  ["Voice", "voice.*", "voice-and-assistant", "Questions that name your app, spoken answers, transcripts."],
+  ["Assistant", "assistant.*", "voice-and-assistant", "Your app's tools for the wearer's model."],
+  ["Settings", "settings.*", "settings", "Every setting the glasses keep."],
+  ["Web apps", "connectGlasses()", "web-apps", "All of it from JavaScript on the Display."],
+];
+
+const cli = `
+$ visor status                  # Visor, the glasses, the band, your app
+$ visor trace                   # every call and event, live
+$ visor simulate band.gestures  # type "index double_tap", get it
+$ visor fake                    # no phone: a fake Visor and Display`;
+
+const packages = [
+  ["com.macedonga.visor:kit", "Android"],
+  ["com.macedonga.visor:kit-testing", "FakeVisor for your app's tests"],
+  ["visor-kit on npm", "TypeScript, Node and the Display's browser"],
+  ["visor-kit on PyPI", "Python"],
+  ["visor", "The command for your computer"],
+];
+
+const wrap = "mx-auto max-w-6xl px-4 sm:px-6";
+const h2 = "text-2xl font-semibold tracking-tight md:text-3xl";
+const button = "inline-flex h-10 items-center rounded px-4 text-[15px] font-medium transition-transform duration-100 active:scale-97";
+---
+<Base
+  title="Visor for developers: build apps for Meta glasses"
+  description="The Visor Development Kit lets Android apps, scripts, AI agents and Display web apps use Meta glasses through Visor, with the wearer's consent. No Meta account, no Meta AI app, no developer review."
+  world="blueprint"
+  section="developers"
+>
+  <section class="grid-paper border-b border-line">
+    <div class:list={[wrap, "pt-16 pb-14 md:pt-24 md:pb-20"]}>
+      <h1 class="max-w-3xl text-5xl leading-none font-semibold tracking-[-0.04em] text-balance md:text-7xl">Build apps for Meta glasses.</h1>
+      <p class="mt-6 max-w-xl text-lg text-muted">Android, Python, TypeScript and web apps on the Display, with the wearer's consent.</p>
+      <div class="mt-8 flex flex-wrap gap-3">
+        <a class:list={[button, "bg-accent text-accent-ink hover:bg-accent/90"]} href={doc("getting-started")}>Get started</a>
+        <a class:list={[button, "border border-line bg-bg hover:border-faint"]} href="/developers/docs/">Docs</a>
+      </div>
+      <!-- These lines, and the card they put on the Display, drawn by the VDK's simulator. -->
+      <figure class="m-0 mt-14 grid items-center gap-6 md:mt-20 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
+        <div class="on-panel overflow-hidden rounded-md bg-panel shadow-xl ring-1 ring-white/10">
+          <div class="border-b border-white/10 px-4 py-2.5 font-mono text-xs text-white/50">KitchenTimer.kt</div>
+          <Code code={card.trim()} lang="kotlin" themes={themes} defaultColor={false} class="!p-5" />
+        </div>
+        <img src="/shots/briefing.webp" width="640" height="640" alt="The card on the Display's Briefing: Kitchen timer, 4:00, Pasta, and a progress bar."
+          class="aspect-square w-full rounded-[5.625%] shadow-xl max-lg:max-w-md" />
+      </figure>
+    </div>
+  </section>
+
+  <section class:list={[wrap, "py-20 md:py-28"]} aria-labelledby="ways-title">
+    <h2 id="ways-title" class:list={[h2, "mb-10"]}>Four ways in</h2>
+    <WaysIn />
+  </section>
+
+  <section class:list={[wrap, "pb-20 md:pb-28"]} aria-labelledby="lang-title">
+    <h2 id="lang-title" class:list={[h2, "mb-8"]}>In your language</h2>
+    <CodeTabs label="Code samples" tabs={tabs} />
+  </section>
+
+  <section class:list={[wrap, "pb-20 md:pb-28"]} aria-labelledby="areas-title">
+    <h2 id="areas-title" class:list={[h2, "mb-6"]}>What your code can use</h2>
+    <ul class="m-0 list-none border-t border-line p-0">
+      {areas.map(([name, ns, slug, line]) => (
+        <li class="border-b border-line">
+          <a href={doc(slug)} class="group grid gap-x-8 gap-y-1 py-4 sm:grid-cols-[10rem_1fr_auto] sm:items-baseline">
+            <strong class="font-semibold group-hover:text-accent">{name}</strong>
+            <span class="text-muted">{line}</span>
+            <code class="text-[13px] text-faint">{ns}</code>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <section class:list={[wrap, "pb-20 md:pb-28"]} aria-labelledby="testing-title">
+    <h2 id="testing-title" class:list={[h2, "mb-8"]}>Test without the glasses</h2>
+    <div class="grid items-center gap-6 lg:grid-cols-[minmax(0,1fr)_15rem]">
+      <div class="on-panel overflow-hidden rounded-md bg-panel ring-1 ring-white/10">
+        <Code code={cli.trim()} lang="sh" themes={themes} defaultColor={false} class="!p-5" />
+      </div>
+      <img src="/shots/detail.webp" width="640" height="640" loading="lazy"
+        alt="The kitchen timer's detail in the Display simulator: started 19:42, ends 19:52, and a Stop button."
+        class="aspect-square w-full max-w-60 rounded-[5.625%]" />
+    </div>
+  </section>
+
+  <section class:list={[wrap, "grid gap-10 pb-20 md:pb-28 md:grid-cols-2"]} aria-labelledby="packages-title">
+    <div>
+      <h2 id="packages-title" class={h2}>Packages</h2>
+    </div>
+    <dl class="m-0 border-t border-line">
+      {packages.map(([name, what]) => (
+        <div class="grid grid-cols-[1fr_auto] gap-4 border-b border-line py-3 text-sm">
+          <dt><code class="text-[13px] break-all">{name}</code></dt>
+          <dd class="m-0 text-right text-muted">{what}</dd>
+        </div>
+      ))}
+    </dl>
+  </section>
+
+  <section class="grid-paper border-t border-line">
+    <div class:list={[wrap, "flex flex-wrap items-center justify-between gap-6 py-14"]}>
+      <h2 class={h2}>How the glasses work, down to the bytes.</h2>
+      <div class="flex flex-wrap gap-3">
+        <a class:list={[button, "bg-accent text-accent-ink hover:bg-accent/90"]} href="/protocol/">The protocol</a>
+        <a class:list={[button, "border border-line bg-bg hover:border-faint"]} href={KIT}>The VDK on GitHub</a>
+      </div>
+    </div>
+  </section>
+</Base>

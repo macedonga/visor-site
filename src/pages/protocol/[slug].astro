@@ -1,0 +1,37 @@
+---
+import { render } from "astro:content";
+import Docs from "../../layouts/Docs.astro";
+import { pages, groups, nameOf, summaryOf, titleOfPage, hrefOfPage } from "../../lib/protocol-book";
+import { docsFor } from "../../lib/related";
+import { allDocs, slugOf, titleOf, hrefOf } from "../../lib/docs";
+
+export async function getStaticPaths() {
+  return (await pages()).filter((p) => nameOf(p) !== "Home").map((page) => ({ params: { slug: nameOf(page).toLowerCase() }, props: { page } }));
+}
+
+const { page } = Astro.props;
+const { Content, headings } = await render(page);
+const name = nameOf(page);
+// Wiki pages take their title from the file name; one that opens with its own `#` title keeps it.
+const titled = /^#\s/.test(page.body ?? "");
+const all = await groups();
+const flat = all.flatMap((g) => g.items);
+const docs = await allDocs();
+const inKit = docsFor(name).map((slug) => ({ href: hrefOf(slug), title: titleOf(docs.find((d) => slugOf(d) === slug)!) }));
+const at = flat.findIndex((i) => i.href === hrefOfPage(name));
+---
+<Docs
+  title={titleOfPage(name)}
+  description={summaryOf(page)}
+  section="protocol"
+  groups={all}
+  current={hrefOfPage(name)}
+  headings={headings}
+  previous={at > 0 ? flat[at - 1] : undefined}
+  next={at >= 0 ? flat[at + 1] : undefined}
+  related={{ lead: "To use this from an app, without the protocol:", items: inKit }}
+  source={{ href: `https://github.com/macedonga/visor-site/blob/main/src/content/protocol/${name}.md`, title: "Edit this page on GitHub" }}
+>
+  {!titled && <h1>{titleOfPage(name)}</h1>}
+  <Content />
+</Docs>

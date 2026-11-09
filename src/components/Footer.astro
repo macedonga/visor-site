@@ -1,0 +1,23 @@
+---
+const REPO = "https://github.com/macedonga/visor";
+const links = [
+  ["Developers", "/developers/"],
+  ["VDK docs", "/developers/docs/"],
+  ["Protocol", "/protocol/"],
+  ["Discussions", `${REPO}/discussions`],
+  ["Report a bug", `${REPO}/issues/new/choose`],
+  ["Security", `${REPO}/blob/main/SECURITY.md`],
+  ["GitHub", REPO],
+];
+---
+<footer class="border-t border-line py-10 text-sm text-muted">
+  <div class="mx-auto flex max-w-6xl flex-wrap justify-between gap-x-10 gap-y-4 px-4 sm:px-6">
+    <p class="max-w-xl">
+      Visor is an independent project, not affiliated with, endorsed by or sponsored by Meta Platforms or
+      EssilorLuxottica. Visor is AGPL-3.0, the Visor Development Kit Apache-2.0.
+    </p>
+    <nav class="flex flex-wrap gap-x-5 gap-y-1.5" aria-label="Footer">
+      {links.map(([name, href]) => <a class="hover:text-ink hover:underline" href={href}>{name}</a>)}
+    </nav>
+  </div>
+</footer>

@@ -1,0 +1,1 @@
+Protocol reference for Meta's smart glasses | Reference code: [Visor](https://github.com/macedonga/visor) | [Protocol traps](Protocol-traps) | [Open questions](Open-questions) | Identifiers appear only as placeholders

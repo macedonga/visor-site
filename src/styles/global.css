@@ -1,0 +1,120 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+/* Preloaded in Base.astro and never swapped in late: "optional" keeps text from moving as a font arrives. */
+@font-face {
+  font-family: "Inter Variable";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: optional;
+  src: url("/fonts/inter.woff2") format("woff2-variations");
+}
+@font-face {
+  font-family: "JetBrains Mono Variable";
+  font-style: normal;
+  font-weight: 100 800;
+  font-display: optional;
+  src: url("/fonts/jetbrains-mono.woff2") format("woff2-variations");
+}
+
+@theme {
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
+  --color-warm: #ffd2a1;
+}
+
+/* Each world sets these variables; the colour utilities (bg-bg, text-muted, border-line...) read them. */
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-line: var(--line);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-panel: var(--panel);
+}
+
+@layer base {
+  /* Visor's night: black, white, and the warm light only in the mark. */
+  [data-world="night"] {
+    --bg: #000000; --surface: #111112; --line: rgb(255 255 255 / 0.1); --ink: #ffffff; --muted: #98989d;
+    --faint: #6e6e73; --accent: #ffffff; --accent-ink: #000000; --panel: #111112;
+    color-scheme: dark;
+  }
+  /* The developers' drawing board: white, ink and one blue; navy when the system is dark. */
+  [data-world="blueprint"], [data-world="paper"] {
+    --bg: #ffffff; --surface: #f4f6fa; --line: #e1e5ec; --grid: rgb(37 99 235 / 0.07); --ink: #0b1220; --muted: #5b6475;
+    --faint: #8a93a5; --accent: #2563eb; --accent-ink: #ffffff; --panel: #0f1729;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    [data-world="blueprint"] {
+      --bg: #0b1220; --surface: #111a2e; --line: #1f2b45; --grid: rgb(122 162 255 / 0.07); --ink: #e6eaf2; --muted: #98a2b6;
+      --faint: #6b7590; --accent: #7aa2ff; --accent-ink: #0b1220; --panel: #070c18;
+      color-scheme: dark;
+    }
+  }
+  body { letter-spacing: -0.011em; }
+  /* No ligatures: "-<" and "->" must read as typed. */
+  code, kbd, pre, samp { font-variant-ligatures: none; letter-spacing: 0; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+}
+
+/* The drawing board: a 24px grid with a heavier line every fifth. */
+@utility grid-paper {
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px),
+    linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 120px 120px, 120px 120px, 24px 24px, 24px 24px;
+  background-position: -1px -1px;
+}
+
+/* Generated markup the templates cannot put classes on: Shiki's code, the docs' alerts and heading links. Outside
+   any layer on purpose: the prose utilities sit in a later layer and would win over a layered rule. */
+.astro-code, .astro-code span { color: var(--shiki-light); background-color: transparent !important; }
+@media (prefers-color-scheme: dark) {
+  [data-world="blueprint"] .astro-code, [data-world="blueprint"] .astro-code span { color: var(--shiki-dark); }
+}
+.on-panel .astro-code, .on-panel .astro-code span { color: var(--shiki-dark) !important; }
+/* Code wraps rather than scrolls: no scrollbar in a code block, at any width. */
+.astro-code { @apply font-mono text-[13px] leading-relaxed; white-space: pre-wrap; overflow-wrap: anywhere; }
+
+/* The typography plugin sets its colours on .prose itself: these take them from the world's palette. */
+.prose {
+  --tw-prose-body: var(--ink); --tw-prose-headings: var(--ink); --tw-prose-lead: var(--muted); --tw-prose-links: var(--accent);
+  --tw-prose-bold: var(--ink); --tw-prose-counters: var(--muted); --tw-prose-bullets: var(--faint); --tw-prose-hr: var(--line);
+  --tw-prose-quotes: var(--muted); --tw-prose-quote-borders: var(--line); --tw-prose-captions: var(--muted);
+  --tw-prose-code: var(--ink); --tw-prose-th-borders: var(--line); --tw-prose-td-borders: var(--line);
+}
+.prose pre.astro-code { @apply my-5 rounded border border-line bg-surface p-4; }
+.prose :not(pre) > code { @apply rounded border border-line bg-surface px-1 py-0.5 font-normal; overflow-wrap: anywhere; }
+.prose :not(pre) > code::before, .prose :not(pre) > code::after { content: none; }
+/* A table wider than the page scrolls on its own, with a thin, quiet scrollbar. */
+.prose table { @apply block overflow-x-auto; scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
+/* In a table an identifier stays whole: broken anywhere, it lets the columns squeeze into slivers. */
+.prose table code { overflow-wrap: normal; white-space: nowrap; }
+.prose :is(h2, h3) { @apply scroll-mt-20; }
+
+/* Mermaid draws its boxes with a drop shadow: the diagrams stay flat, like the rest of the page. */
+.diagram svg * { filter: none !important; box-shadow: none !important; }
+
+.heading-link { @apply ml-2 font-normal text-faint no-underline opacity-0; }
+.heading-link::after { content: "#"; }
+.prose :is(h2, h3):hover .heading-link, .heading-link:focus-visible { @apply opacity-100; }
+
+.alert { --tone: var(--accent); @apply my-6 border-l-2 py-1 pl-4; border-color: var(--tone); }
+.alert::before { content: attr(data-label); @apply block text-sm font-semibold; color: var(--tone); }
+.alert > :first-child { @apply mt-1; }
+.alert > :last-child { @apply mb-0; }
+.alert-tip { --tone: #1a7f37; }
+.alert-important { --tone: #8250df; }
+.alert-warning { --tone: #9a6700; }
+.alert-caution { --tone: #cf222e; }
+@media (prefers-color-scheme: dark) {
+  .alert-tip { --tone: #57ab5a; }
+  .alert-important { --tone: #b083f0; }
+  .alert-warning { --tone: #c69026; }
+  .alert-caution { --tone: #e5534b; }
+}

@@ -1,0 +1,35 @@
+---
+// The VDK's four ways in: four sources on one bus into Visor, one link out to the glasses.
+const ways = [
+  ["Your Android app", "VDK library"],
+  ["Your computer", "adb, JSON-RPC"],
+  ["Programs and AI agents", "WebSocket, MCP"],
+  ["A web app on the Display", "The Display's browser"],
+];
+const box = "relative rounded bg-bg px-4";
+const thin = "border border-accent/50";
+---
+<figure class="m-0 grid items-center gap-y-6 md:grid-cols-[1.3fr_0.8fr_0.9fr_0.8fr]">
+  <!-- md and up: each source reaches right to a bus; the bus reaches Visor. -->
+  <ul class="relative m-0 grid list-none gap-3 p-0 max-md:grid-cols-2 max-sm:grid-cols-1 md:mr-14
+    md:after:absolute md:after:top-[calc(12.5%-4px)] md:after:-right-7 md:after:bottom-[calc(12.5%-4px)] md:after:border-r md:after:border-accent/50">
+    {ways.map(([who, how]) => (
+      <li class:list={[box, thin, "py-3 md:after:absolute md:after:top-1/2 md:after:left-full md:after:w-7 md:after:border-t md:after:border-accent/50"]}>
+        <strong class="block text-[15px] font-semibold">{who}</strong><span class="text-sm text-muted">{how}</span>
+      </li>
+    ))}
+  </ul>
+  <div class:list={[box, "border-2 border-accent py-6 text-center md:before:absolute md:before:top-1/2 md:before:right-full md:before:w-7 md:before:border-t md:before:border-accent/50"]}>
+    <strong class="block text-lg font-semibold">Visor</strong><span class="text-sm text-muted">on the phone</span>
+  </div>
+  <div class="relative h-px bg-accent/50 max-md:mx-auto max-md:h-16 max-md:w-px">
+    <span class="absolute bottom-2.5 left-1/2 -translate-x-1/2 text-xs whitespace-nowrap text-muted max-md:top-1/2 max-md:bottom-auto max-md:left-4 max-md:translate-x-0 max-md:-translate-y-1/2">Bluetooth, Wi-Fi Direct</span>
+  </div>
+  <div class:list={[box, thin, "py-6 text-center"]}>
+    <strong class="block text-lg font-semibold">Glasses</strong><span class="text-sm text-muted">and Neural Band</span>
+  </div>
+  <figcaption class="sr-only">
+    Your Android app, your computer, programs and AI agents, and web apps on the Display all reach Visor on the phone,
+    which reaches the glasses over Bluetooth and Wi-Fi Direct.
+  </figcaption>
+</figure>

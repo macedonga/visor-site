@@ -1,0 +1,46 @@
+---
+import { Code } from "astro:components";
+
+interface Tab { label: string; lang: string; code: string; note?: string }
+interface Props { tabs: Tab[]; label: string }
+const { tabs, label } = Astro.props;
+const id = `tabs-${label.toLowerCase().replace(/[^a-z]+/g, "-")}`;
+---
+<div class="rounded border border-line" data-tabs>
+  <div class="flex gap-1 overflow-x-auto border-b border-line px-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" role="tablist" aria-label={label}>
+    {tabs.map((t, i) => (
+      <button type="button" role="tab" id={`${id}-${i}`} aria-controls={`${id}-panel-${i}`} aria-selected={i === 0 ? "true" : "false"} tabindex={i === 0 ? 0 : -1}
+        class="-mb-px shrink-0 border-b-2 border-transparent px-3 pt-3 pb-2.5 text-sm text-muted hover:text-ink aria-selected:border-accent aria-selected:text-ink">{t.label}</button>
+    ))}
+  </div>
+  {tabs.map((t, i) => (
+    <div role="tabpanel" id={`${id}-panel-${i}`} aria-labelledby={`${id}-${i}`} hidden={i !== 0} class="[&_.astro-code]:!rounded-none [&_.astro-code]:!border-0 [&_.astro-code]:p-5">
+      <Code code={t.code.trim()} lang={t.lang as any} themes={{ light: "github-light", dark: "github-dark-dimmed" }} defaultColor={false} />
+      {t.note && <p class="border-t border-line px-5 py-3 text-sm text-muted [&_a]:text-accent [&_a]:underline [&_code]:text-ink" set:html={t.note} />}
+    </div>
+  ))}
+</div>
+
+<script>
+  for (const root of document.querySelectorAll<HTMLElement>("[data-tabs]")) {
+    const tabs = [...root.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
+    const select = (tab: HTMLButtonElement, focus: boolean) => {
+      for (const t of tabs) {
+        const on = t === tab;
+        t.setAttribute("aria-selected", String(on));
+        t.tabIndex = on ? 0 : -1;
+        root.querySelector<HTMLElement>(`#${t.getAttribute("aria-controls")}`)!.hidden = !on;
+      }
+      if (focus) tab.focus();
+    };
+    tabs.forEach((tab, i) => {
+      tab.addEventListener("click", () => select(tab, false));
+      tab.addEventListener("keydown", (e) => {
+        const to = e.key === "ArrowRight" ? i + 1 : e.key === "ArrowLeft" ? i - 1 : e.key === "Home" ? 0 : e.key === "End" ? tabs.length - 1 : null;
+        if (to === null) return;
+        e.preventDefault();
+        select(tabs[(to + tabs.length) % tabs.length], true);
+      });
+    });
+  }
+</script>

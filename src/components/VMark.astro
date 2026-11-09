@@ -1,0 +1,19 @@
+---
+// Visor's mark: lit, as on the app icon, or plain in the text colour.
+interface Props { variant?: "lit" | "plain"; class?: string }
+const { variant = "lit", class: className } = Astro.props;
+const id = `v${Math.random().toString(36).slice(2, 8)}`;
+const path = "M30 44 L89 44 L123 214 L115 214 Z M226 44 L167 44 L133 214 L141 214 Z";
+---
+{variant === "plain" ? (
+  <svg class={className} viewBox="30 44 196 170" aria-hidden="true"><path fill="currentColor" d={path} /></svg>
+) : (
+  <svg class={className} viewBox="30 44 196 170" aria-hidden="true">
+    <defs>
+      <linearGradient id={id} x1="0" y1="44" x2="0" y2="214" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stop-color="#FFFFFF" /><stop offset="1" stop-color="#FFD2A1" />
+      </linearGradient>
+    </defs>
+    <path fill={`url(#${id})`} d={path} />
+  </svg>
+)}

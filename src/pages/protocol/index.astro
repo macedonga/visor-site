@@ -1,0 +1,21 @@
+---
+import { render } from "astro:content";
+import Docs from "../../layouts/Docs.astro";
+import { pages, groups, nameOf, summaryOf } from "../../lib/protocol-book";
+
+const home = (await pages()).find((p) => nameOf(p) === "Home")!;
+const { Content, headings } = await render(home);
+const all = await groups();
+---
+<Docs
+  title="Meta glasses protocol"
+  description={summaryOf(home)}
+  section="protocol"
+  groups={all}
+  current="/protocol/"
+  headings={headings}
+  next={all[0]?.items[0]}
+>
+  <h1>Meta glasses protocol</h1>
+  <Content />
+</Docs>

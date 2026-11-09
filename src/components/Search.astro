@@ -1,0 +1,122 @@
+---
+// Full-text search over the docs and the protocol pages, with Pagefind's index built after the site.
+// "/" or Ctrl+K opens it.
+---
+<button type="button" data-search-open aria-haspopup="dialog"
+  class="flex h-10 w-full max-w-md min-w-0 items-center gap-2.5 rounded border border-line bg-surface px-3 text-left text-sm text-muted hover:border-faint">
+  <svg class="size-4 shrink-0" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="7" cy="7" r="5" /><path d="M11 11l3.5 3.5" /></svg>
+  <span class="flex-1 truncate"><span class="sm:hidden">Search</span><span class="max-sm:hidden">Search the VDK docs and the protocol</span></span>
+  <kbd class="rounded-sm border border-line bg-bg px-1.5 text-xs text-faint max-sm:hidden">/</kbd>
+</button>
+
+<dialog aria-label="Search the VDK docs and the protocol"
+  class="search m-auto mt-20 max-h-[min(640px,100dvh-6rem)] w-[min(680px,100%-2rem)] flex-col overflow-hidden rounded-md border border-line bg-bg p-0 text-ink shadow-2xl
+    opacity-0 -translate-y-1 transition-[opacity,translate,display,overlay] transition-discrete duration-150 ease-out
+    open:flex open:translate-y-0 open:opacity-100 starting:open:-translate-y-1 starting:open:opacity-0
+    backdrop:bg-black/40">
+  <form method="dialog" role="search" class="flex items-center gap-3 border-b border-line pr-3 pl-4 text-muted">
+    <svg class="size-4.5 shrink-0" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="7" cy="7" r="5" /><path d="M11 11l3.5 3.5" /></svg>
+    <input type="search" placeholder="Search the VDK docs and the protocol" aria-label="Search the VDK docs and the protocol" autocomplete="off" spellcheck="false"
+      class="h-14 min-w-0 flex-1 bg-transparent text-lg text-ink outline-none placeholder:text-faint [&::-webkit-search-cancel-button]:hidden" />
+    <button type="submit" class="rounded-sm border border-line px-2 py-1 text-xs text-muted hover:text-ink">Esc</button>
+  </form>
+  <p data-status aria-live="polite" class="px-4 pt-3 pb-1 text-sm text-muted empty:hidden">Type a method, a service or a word: band.gestures, svc36, AirShield.</p>
+  <ol data-results class="m-0 list-none overflow-y-auto p-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"></ol>
+</dialog>
+
+<script>
+  type Sub = { title: string; url: string; excerpt: string };
+  type Hit = { url: string; excerpt: string; meta: { title?: string; section?: string }; sub_results?: Sub[] };
+  type Pagefind = { init(): Promise<void>; debouncedSearch(q: string, o?: object, ms?: number): Promise<{ results: { data(): Promise<Hit> }[] } | null> };
+
+  const HINT = "Type a method, a service or a word: band.gestures, svc36, AirShield.";
+  const dialog = document.querySelector<HTMLDialogElement>("dialog.search");
+  const input = dialog?.querySelector("input");
+  const status = dialog?.querySelector("[data-status]");
+  const list = dialog?.querySelector("[data-results]");
+  let engine: Promise<Pagefind | null> | null = null;
+
+  const load = () => (engine ??= (async () => {
+    try {
+      const url = "/pagefind/pagefind.js";
+      const pagefind: Pagefind = await import(/* @vite-ignore */ url);
+      await pagefind.init();
+      return pagefind;
+    } catch {
+      return null;
+    }
+  })());
+
+  const open = () => {
+    if (!dialog || dialog.open) return;
+    dialog.showModal();
+    input?.select();
+    load();
+  };
+
+  const escape = (s: string) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]!);
+
+  async function find(query: string) {
+    if (!list || !status) return;
+    if (!query.trim()) {
+      list.innerHTML = "";
+      status.textContent = HINT;
+      return;
+    }
+    const pagefind = await load();
+    if (!pagefind) {
+      status.textContent = "Search works on the published site. Use the sidebar here.";
+      return;
+    }
+    const search = await pagefind.debouncedSearch(query, {}, 120);
+    if (search === null) return;
+    const hits = await Promise.all(search.results.slice(0, 8).map((r) => r.data()));
+    if (hits.length === 0) {
+      list.innerHTML = "";
+      status.textContent = `No page mentions "${query}". Try a shorter word or a method name.`;
+      return;
+    }
+    status.textContent = "";
+    list.innerHTML = hits.map((hit) => {
+      // The page's own title comes back as a section too: point at the first real section instead.
+      const sub = hit.sub_results?.find((s) => s.url !== hit.url && s.title !== hit.meta.title);
+      const where = sub ? `<span class="font-normal text-muted"> / ${escape(sub.title)}</span>` : "";
+      return `<li><a href="${sub?.url ?? hit.url}" class="block rounded px-3 py-2.5 outline-none hover:bg-surface focus-visible:bg-surface">
+        <span class="flex items-baseline justify-between gap-4"><strong class="font-medium">${escape(hit.meta.title ?? hit.url)}${where}</strong>
+        <span class="shrink-0 text-xs text-faint">${escape(hit.meta.section ?? "")}</span></span>
+        <span class="mt-0.5 block text-sm text-muted [&_mark]:bg-accent/20 [&_mark]:text-ink">${sub?.excerpt ?? hit.excerpt}</span></a></li>`;
+    }).join("");
+  }
+
+  input?.addEventListener("input", () => find(input.value));
+  input?.addEventListener("keydown", (e) => {
+    // A search field's first Escape only clears its text; here Escape always closes.
+    if (e.key === "Escape") {
+      e.preventDefault();
+      dialog?.close();
+      return;
+    }
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      list?.querySelector("a")?.focus();
+    }
+  });
+  list?.addEventListener("keydown", (e) => {
+    const key = (e as KeyboardEvent).key;
+    if (key !== "ArrowDown" && key !== "ArrowUp") return;
+    e.preventDefault();
+    const links = [...list.querySelectorAll("a")];
+    const to = links.indexOf(document.activeElement as HTMLAnchorElement) + (key === "ArrowDown" ? 1 : -1);
+    if (to < 0) input?.focus();
+    else links[Math.min(to, links.length - 1)]?.focus();
+  });
+  dialog?.addEventListener("click", (e) => { if (e.target === dialog) dialog.close(); });
+  document.querySelectorAll("[data-search-open]").forEach((b) => b.addEventListener("click", open));
+  document.addEventListener("keydown", (e) => {
+    const typing = (e.target as HTMLElement).closest("input, textarea, [contenteditable]");
+    if ((e.key === "/" && !typing) || (e.key.toLowerCase() === "k" && (e.metaKey || e.ctrlKey))) {
+      e.preventDefault();
+      open();
+    }
+  });
+</script>

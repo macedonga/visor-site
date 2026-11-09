@@ -1,0 +1,32 @@
+---
+import VMark from "./VMark.astro";
+import Search from "./Search.astro";
+
+interface Props { section: "visor" | "developers" | "docs" | "protocol" }
+const { section } = Astro.props;
+const RELEASES = "https://github.com/macedonga/visor/releases/latest";
+const link = "px-2.5 py-2 text-sm text-muted hover:text-ink aria-[current=page]:text-ink";
+---
+<header class="sticky top-0 z-20 border-b border-line bg-bg">
+  <div class="mx-auto flex h-15 max-w-6xl items-center gap-4 px-4 sm:px-6">
+    {section === "visor" ? (
+      <a class="flex items-center gap-2.5 font-semibold tracking-tight" href="/"><VMark variant="lit" class="size-5" />Visor</a>
+    ) : (
+      <a class="flex items-center gap-2.5 font-semibold tracking-tight" href="/developers/">
+        <VMark variant="plain" class="size-5" />Visor <span class="-ml-1 font-normal text-muted">Developers</span>
+      </a>
+    )}
+    <nav class="ml-auto flex min-w-0 flex-1 items-center justify-end gap-0.5" aria-label="Site">
+      {section === "visor" ? (
+        <>
+          <a class:list={[link, "max-sm:hidden"]} href="/#features">Features</a>
+          <a class:list={[link, "max-sm:hidden"]} href="/#privacy">Privacy</a>
+          <a class={link} href="/developers/">Developers</a>
+          <a class="ml-2 inline-flex h-9 items-center rounded-full bg-white px-4 text-sm font-medium text-black transition-transform active:scale-97" href={RELEASES}>Download</a>
+        </>
+      ) : (
+        <Search />
+      )}
+    </nav>
+  </div>
+</header>

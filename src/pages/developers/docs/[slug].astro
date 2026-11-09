@@ -1,0 +1,30 @@
+---
+import { render } from "astro:content";
+import Docs from "../../../layouts/Docs.astro";
+import { allDocs, slugOf, titleOf, summaryOf, nav, neighbours, hrefOf } from "../../../lib/docs";
+import { protocolFor } from "../../../lib/related";
+
+export async function getStaticPaths() {
+  const docs = await allDocs();
+  return docs.filter((d) => slugOf(d) !== "index").map((doc) => ({ params: { slug: slugOf(doc) }, props: { doc } }));
+}
+
+const { doc } = Astro.props;
+const { Content, headings } = await render(doc);
+const slug = slugOf(doc);
+const { previous, next } = await neighbours(slug);
+---
+<Docs
+  title={titleOf(doc)}
+  description={summaryOf(doc)}
+  section="docs"
+  groups={await nav()}
+  current={hrefOf(slug)}
+  headings={headings}
+  previous={previous}
+  next={next}
+  related={{ lead: "On the wire:", items: protocolFor(slug) }}
+  source={{ href: `https://github.com/macedonga/visor-site/blob/main/src/content/docs/${doc.id}.md`, title: "Edit this page on GitHub" }}
+>
+  <Content />
+</Docs>

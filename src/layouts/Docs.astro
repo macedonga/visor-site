@@ -1,0 +1,187 @@
+---
+// The layout of both books: the VDK's docs and the protocol pages.
+import Base from "./Base.astro";
+
+interface Item { href: string; title: string }
+interface Heading { depth: number; slug: string; text: string }
+interface Props {
+  title: string;
+  description: string;
+  section: "docs" | "protocol";
+  groups: { title: string; items: Item[] }[];
+  current: string;
+  headings?: Heading[];
+  previous?: Item;
+  next?: Item;
+  source?: Item;
+  /** Pages of the other book about the same thing, and how to name them. */
+  related?: { lead: string; items: Item[] };
+}
+const { title, description, section, groups, current, headings = [], previous, next, source, related } = Astro.props;
+const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
+// The two books, named and told apart at the top of every sidebar.
+const BOOKS = [
+  { section: "docs", href: "/developers/docs/", name: "VDK docs", what: "Build apps that use the glasses" },
+  { section: "protocol", href: "/protocol/", name: "Protocol", what: "How the glasses talk to the phone" },
+];
+const book = BOOKS.find((b) => b.section === section)!.name;
+const rule = "-ml-px block border-l border-transparent pl-3 hover:text-ink";
+const noBar = "[scrollbar-width:none] [&::-webkit-scrollbar]:hidden";
+---
+<Base title={`${title} | Visor ${book}`} description={description} world="blueprint" section={section}>
+  <div class="mx-auto grid max-w-6xl items-start gap-x-10 px-4 sm:px-6 md:grid-cols-[12rem_minmax(0,1fr)] xl:grid-cols-[12rem_minmax(0,1fr)_11rem]">
+    <nav aria-label={book} class:list={["border-b border-line md:sticky md:top-15 md:max-h-[calc(100dvh-3.75rem)] md:overflow-y-auto md:border-0 md:py-8", noBar]}>
+      <button type="button" aria-expanded="true" aria-controls="book-nav" data-menu
+        class="group flex h-12 w-full items-center justify-between font-medium md:hidden">
+        {book} menu
+        <svg class="size-3.5 transition-transform group-aria-expanded:rotate-180" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 5l4 4 4-4" /></svg>
+      </button>
+      <div id="book-nav" class="pb-6 md:pb-0">
+        <ul class="m-0 list-none border-l border-line p-0">
+          {BOOKS.map((b) => (
+            <li>
+              <a href={b.href} aria-current={b.section === section ? (current === b.href ? "page" : "true") : undefined}
+                class:list={[rule, "group py-1.5 aria-[current]:border-accent"]}>
+                <span class="block text-sm font-semibold group-aria-[current]:text-accent">{b.name}</span>
+                <span class="block text-xs text-muted">{b.what}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+        {groups.map((g) => (
+          <section class="mt-6">
+            <h2 class="mb-1.5 text-xs font-semibold tracking-normal text-ink">{g.title}</h2>
+            <ul class="m-0 list-none border-l border-line p-0">
+              {g.items.map((i) => (
+                <li><a class:list={[rule, "py-1.5 text-sm leading-snug text-muted aria-[current=page]:border-accent aria-[current=page]:text-accent"]} href={i.href} aria-current={i.href === current ? "page" : undefined}>{i.title}</a></li>
+              ))}
+            </ul>
+          </section>
+        ))}
+      </div>
+    </nav>
+
+    <div class="min-w-0 py-8 md:py-12">
+      <article data-pagefind-body data-pagefind-meta={`section:${book}`}
+        class="prose max-w-[72ch] prose-headings:font-semibold prose-headings:tracking-tight prose-h1:text-4xl prose-h2:mt-14
+          prose-a:font-normal prose-a:decoration-accent/40 prose-a:underline-offset-3 hover:prose-a:decoration-accent prose-code:font-normal prose-th:text-left">
+        <slot />
+      </article>
+      {related && related.items.length > 0 && (
+        <p class="mt-12 max-w-[72ch] rounded border border-line bg-surface px-4 py-3 text-sm text-muted">
+          {related.lead}{" "}
+          {related.items.map((i, n) => (
+            <>{n > 0 && (n === related.items.length - 1 ? " and " : ", ")}<a class="font-medium text-accent underline decoration-accent/40 hover:decoration-accent" href={i.href}>{i.title}</a></>
+          ))}.
+        </p>
+      )}
+      {(previous || next || source) && (
+        <footer class="mt-16 max-w-[72ch] border-t border-line pt-6 text-sm">
+          <div class="flex justify-between gap-6">
+            {previous ? <a class="group" href={previous.href}><span class="block text-muted">Previous</span><span class="font-medium group-hover:text-accent">{previous.title}</span></a> : <span />}
+            {next && <a class="group text-right" href={next.href}><span class="block text-muted">Next</span><span class="font-medium group-hover:text-accent">{next.title}</span></a>}
+          </div>
+          {source && <a class="mt-8 inline-block text-muted hover:text-ink hover:underline" href={source.href}>{source.title}</a>}
+        </footer>
+      )}
+    </div>
+
+    {toc.length > 1 && (
+      <aside class:list={["sticky top-15 hidden max-h-[calc(100dvh-3.75rem)] overflow-y-auto py-12 text-sm xl:block", noBar]} aria-labelledby="toc-title">
+        <h2 id="toc-title" class="mb-2 text-xs font-semibold">On this page</h2>
+        <ul class="m-0 list-none border-l border-line p-0">
+          {toc.map((h) => (
+            <li><a href={`#${h.slug}`} class:list={["-ml-px block border-l border-transparent py-1 leading-snug text-muted hover:text-ink [&.active]:border-accent [&.active]:text-accent", h.depth === 3 ? "pl-6" : "pl-3"]}>{h.text}</a></li>
+          ))}
+        </ul>
+      </aside>
+    )}
+  </div>
+</Base>
+
+<script>
+  // On a phone the menu starts closed; without JavaScript it stays open.
+  const menu = document.querySelector<HTMLButtonElement>("[data-menu]");
+  const list = document.getElementById("book-nav");
+  const setMenu = (open: boolean) => {
+    menu?.setAttribute("aria-expanded", String(open));
+    list?.classList.toggle("max-md:hidden", !open);
+  };
+  if (matchMedia("(max-width: 767px)").matches) setMenu(false);
+  menu?.addEventListener("click", () => setMenu(menu.getAttribute("aria-expanded") !== "true"));
+
+  // The section being read, marked in "On this page".
+  const links = new Map([...document.querySelectorAll<HTMLAnchorElement>("aside a[href^='#']")].map((a) => [decodeURIComponent(a.hash.slice(1)), a]));
+  if (links.size) {
+    const seen = new Set<string>();
+    const order = [...links.keys()];
+    const observer = new IntersectionObserver((entries) => {
+      for (const e of entries) e.isIntersecting ? seen.add(e.target.id) : seen.delete(e.target.id);
+      const current = order.find((id) => seen.has(id));
+      if (current) links.forEach((a, id) => a.classList.toggle("active", id === current));
+    }, { rootMargin: "-64px 0px -60% 0px" });
+    order.forEach((id) => { const h = document.getElementById(id); if (h) observer.observe(h); });
+  }
+
+  // A copy button on every code block.
+  for (const pre of document.querySelectorAll<HTMLPreElement>("article pre.astro-code")) {
+    const box = document.createElement("div");
+    box.className = "group relative not-prose";
+    // The box takes the block's own margins, so nothing moves when the button arrives.
+    const { marginTop, marginBottom } = getComputedStyle(pre);
+    box.style.margin = `${marginTop} 0 ${marginBottom}`;
+    pre.style.margin = "0";
+    pre.replaceWith(box);
+    box.append(pre);
+    const copy = document.createElement("button");
+    copy.type = "button";
+    // Shown on hover or keyboard focus; a touch screen has no hover, and the button would sit on the code.
+    copy.className = "absolute top-2 right-2 rounded-sm border border-line bg-bg px-2 py-0.5 text-xs text-muted opacity-0 hover:text-ink group-hover:opacity-100 focus-visible:opacity-100 [@media(hover:none)]:hidden";
+    copy.textContent = "Copy";
+    copy.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(pre.innerText.replace(/\n$/, ""));
+        copy.textContent = "Copied";
+      } catch {
+        copy.textContent = "Copy failed";
+      }
+      setTimeout(() => (copy.textContent = "Copy"), 1600);
+    });
+    box.append(copy);
+  }
+
+  // Mermaid diagrams, drawn in the page's palette. The library loads only where a diagram is.
+  const diagrams = [...document.querySelectorAll<HTMLElement>("article pre:has(> code.language-mermaid)")];
+  if (diagrams.length) {
+    const sources = diagrams.map((d) => d.textContent ?? "");
+    const draw = async () => {
+      const { default: mermaid } = await import("mermaid");
+      // Mermaid sizes its boxes by measuring text: measured in a fallback font, the labels come out clipped.
+      await document.fonts.ready;
+      const css = getComputedStyle(document.documentElement);
+      const v = (name: string) => css.getPropertyValue(name).trim();
+      const font = "Inter Variable, Inter, system-ui, sans-serif";
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: "base",
+        fontFamily: font,
+        themeVariables: {
+          fontFamily: font, fontSize: "15px", background: v("--bg"), primaryColor: v("--bg"), primaryBorderColor: v("--accent"),
+          primaryTextColor: v("--ink"), secondaryColor: v("--surface"), tertiaryColor: v("--surface"), lineColor: v("--accent"),
+          textColor: v("--ink"), edgeLabelBackground: v("--bg"),
+        },
+      });
+      for (const [i, d] of diagrams.entries()) {
+        const { svg } = await mermaid.render(`diagram-${i}-${Date.now()}`, sources[i]);
+        const figure = document.createElement("figure");
+        figure.className = "diagram not-prose my-6 overflow-x-auto rounded border border-line p-5 text-center [&_svg]:mx-auto [&_svg]:h-auto [&_svg]:max-w-full";
+        figure.innerHTML = svg;
+        d.replaceWith(figure);
+        diagrams[i] = figure;
+      }
+    };
+    draw();
+    // Redraw when the system switches between light and dark.
+    matchMedia("(prefers-color-scheme: dark)").addEventListener("change", draw);
+  }
+</script>
