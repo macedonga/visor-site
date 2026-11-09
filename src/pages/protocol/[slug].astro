@@ -27,6 +27,7 @@ const at = flat.findIndex((i) => i.href === hrefOfPage(name));
   groups={all}
   current={hrefOfPage(name)}
   headings={headings}
+  markdown={`/protocol/${name.toLowerCase()}.md`}
   previous={at > 0 ? flat[at - 1] : undefined}
   next={at >= 0 ? flat[at + 1] : undefined}
   related={{ lead: "To use this from an app, without the protocol:", items: inKit }}

@@ -3,6 +3,7 @@ import Base from "../../layouts/Base.astro";
 import WaysIn from "../../components/WaysIn.astro";
 import CodeTabs from "../../components/CodeTabs.astro";
 import { Code } from "astro:components";
+import { allDocs, slugOf } from "../../lib/docs";
 
 const KIT = "https://github.com/macedonga/visor-kit";
 const doc = (slug: string) => `/developers/docs/${slug}/`;
@@ -90,6 +91,19 @@ const tools = [
   ["FakeVisor", "Visor inside your app's unit tests, with the same Display."],
 ];
 
+// The setup prompt is the AI page's first one, so the two never drift apart.
+const aiPage = (await allDocs()).find((d) => slugOf(d) === "ai-tools")!;
+// The fence is written as \x60 (a backtick): Astro's compiler misreads backticks inside a regex here.
+const setupPrompt = /\x60{3}text\r?\n([\s\S]*?)\x60{3}/.exec(aiPage.body ?? "")![1].trim();
+const ai = doc("ai-tools");
+const agentKit = [
+  ["Every page, for agents", "llms.txt, llms-full.txt, and any page as .md", `${ai}#what-agents-can-read`],
+  ["The docs over MCP", "visor docs-mcp", `${ai}#the-docs-as-an-mcp-server`],
+  ["Rules for agents", "visor agents > AGENTS.md", `${ai}#rules-for-agents`],
+  ["The Claude Code plugin", "/plugin install vdk@visor-kit", `${ai}#the-claude-code-plugin`],
+  ["Fake glasses for agents", "visor fake, MCP on port 7333", `${ai}#the-glasses-for-agents`],
+];
+
 const installs = [
   ["Android", 'implementation("com.macedonga.visor:kit:0.1.0")'],
   ["Android tests", 'testImplementation("com.macedonga.visor:kit-testing:0.1.0")'],
@@ -137,6 +151,29 @@ const button = "inline-flex h-10 items-center rounded px-4 text-[15px] font-medi
   <section class:list={[wrap, "pb-20 md:pb-28"]} aria-labelledby="lang-title">
     <h2 id="lang-title" class:list={[h2, "mb-8"]}>In your language</h2>
     <CodeTabs label="Code samples" tabs={tabs} />
+  </section>
+
+  <section class:list={[wrap, "pb-20 md:pb-28"]} aria-labelledby="ai-title">
+    <h2 id="ai-title" class:list={[h2, "mb-8"]}>AI-assisted development</h2>
+    <div class="grid items-start gap-6 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)]">
+      <div data-copy-scope class="on-panel overflow-hidden rounded-md bg-panel ring-1 ring-white/10">
+        <div class="flex items-center justify-between border-b border-white/10 py-1.5 pr-2 pl-4 font-mono text-xs text-white/50">
+          Paste into your agent
+          <button type="button" data-copy class="rounded-sm border border-white/15 px-2 py-0.5 font-sans text-white/70 hover:text-white">Copy</button>
+        </div>
+        <pre data-line class="m-0 p-5 font-mono text-[13px] leading-relaxed whitespace-pre-wrap text-white/85">{setupPrompt}</pre>
+      </div>
+      <ul class="m-0 list-none border-t border-line p-0">
+        {agentKit.map(([name, how, href]) => (
+          <li class="border-b border-line">
+            <a href={href} class="group grid gap-0.5 py-3">
+              <span class="font-medium group-hover:text-accent">{name}</span>
+              <code class="text-[13px] text-muted">{how}</code>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
   </section>
 
   <section class:list={[wrap, "pb-20 md:pb-28"]} aria-labelledby="areas-title">
@@ -206,7 +243,8 @@ const button = "inline-flex h-10 items-center rounded px-4 text-[15px] font-medi
 <script>
   for (const button of document.querySelectorAll<HTMLButtonElement>("[data-copy]")) {
     button.addEventListener("click", async () => {
-      const line = button.parentElement?.querySelector("[data-line]")?.textContent ?? "";
+      // The line to copy sits in the same row, or in the same panel as the button.
+      const line = button.closest("li, [data-copy-scope]")?.querySelector("[data-line]")?.textContent ?? "";
       try {
         await navigator.clipboard.writeText(line);
         button.textContent = "Copied";

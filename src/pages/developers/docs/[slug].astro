@@ -21,6 +21,7 @@ const { previous, next } = await neighbours(slug);
   groups={await nav()}
   current={hrefOf(slug)}
   headings={headings}
+  markdown={`/developers/docs/${slug}.md`}
   previous={previous}
   next={next}
   related={{ lead: "On the wire:", items: protocolFor(slug) }}

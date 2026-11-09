@@ -25,5 +25,5 @@ Start with the overview, then getting started. The rest is reference.
    raw access.
 10. [Compatibility](compatibility.md): what never breaks, and how the build makes sure.
 11. [Porting from Meta's DAT](porting-from-dat.md): each part of Meta's toolkit and its VDK equivalent.
-12. [AI tools](ai-tools.md): the docs search and its MCP server, guidance for coding assistants, the Claude Code
+12. [AI-assisted development](ai-tools.md): prompts for your agent, the docs search and its MCP server, the Claude Code
     plugin.

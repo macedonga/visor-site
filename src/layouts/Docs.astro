@@ -14,10 +14,12 @@ interface Props {
   previous?: Item;
   next?: Item;
   source?: Item;
+  /** The page as Markdown, for agents and for pasting into a chat. */
+  markdown?: string;
   /** Pages of the other book about the same thing, and how to name them. */
   related?: { lead: string; items: Item[] };
 }
-const { title, description, section, groups, current, headings = [], previous, next, source, related } = Astro.props;
+const { title, description, section, groups, current, headings = [], previous, next, source, markdown, related } = Astro.props;
 const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
 // The two books, named and told apart at the top of every sidebar.
 const BOOKS = [
@@ -81,13 +83,18 @@ const noBar = "[scrollbar-width:none] [&::-webkit-scrollbar]:hidden";
             {previous ? <a class="group" href={previous.href}><span class="block text-muted">Previous</span><span class="font-medium group-hover:text-accent">{previous.title}</span></a> : <span />}
             {next && <a class="group text-right" href={next.href}><span class="block text-muted">Next</span><span class="font-medium group-hover:text-accent">{next.title}</span></a>}
           </div>
-          {source && <a class="mt-8 inline-block text-muted hover:text-ink hover:underline" href={source.href}>{source.title}</a>}
+          <div class="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-muted">
+            {markdown && <button type="button" data-copy-markdown={markdown} class="hover:text-ink hover:underline">Copy as Markdown</button>}
+            {markdown && <a class="hover:text-ink hover:underline" href={markdown}>View as Markdown</a>}
+            {source && <a class="hover:text-ink hover:underline" href={source.href}>{source.title}</a>}
+          </div>
         </footer>
       )}
     </div>
 
     {toc.length > 1 && (
       <aside class:list={["sticky top-15 hidden max-h-[calc(100dvh-3.75rem)] overflow-y-auto py-12 text-sm xl:block", noBar]} aria-labelledby="toc-title">
+        {markdown && <button type="button" data-copy-markdown={markdown} class="mb-6 rounded-sm border border-line px-2 py-1 text-xs text-muted hover:text-ink">Copy as Markdown</button>}
         <h2 id="toc-title" class="mb-2 text-xs font-semibold">On this page</h2>
         <ul class="m-0 list-none border-l border-line p-0">
           {toc.map((h) => (
@@ -121,6 +128,21 @@ const noBar = "[scrollbar-width:none] [&::-webkit-scrollbar]:hidden";
       if (current) links.forEach((a, id) => a.classList.toggle("active", id === current));
     }, { rootMargin: "-64px 0px -60% 0px" });
     order.forEach((id) => { const h = document.getElementById(id); if (h) observer.observe(h); });
+  }
+
+  // The page as Markdown, for pasting into a chat with an agent.
+  for (const button of document.querySelectorAll<HTMLButtonElement>("[data-copy-markdown]")) {
+    const label = button.textContent;
+    button.addEventListener("click", async () => {
+      try {
+        const markdown = await (await fetch(button.dataset.copyMarkdown!)).text();
+        await navigator.clipboard.writeText(markdown);
+        button.textContent = "Copied";
+      } catch {
+        button.textContent = "Copy failed";
+      }
+      setTimeout(() => (button.textContent = label), 1600);
+    });
   }
 
   // A copy button on every code block.

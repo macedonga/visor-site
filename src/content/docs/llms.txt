@@ -25,7 +25,7 @@
 - [The network door](network.md): JSON-RPC and MCP over the network.
 - [Compatibility](compatibility.md): how apps and Visor stay compatible across versions.
 - [Porting from DAT](porting-from-dat.md): each part of Meta's DAT and its VDK equivalent.
-- [AI tools](ai-tools.md): the docs search, its MCP server, and guidance for coding assistants.
+- [AI-assisted development](ai-tools.md): prompts for your agent, the docs search, its MCP server, and guidance for coding assistants.
 
 ## Optional
 

@@ -10,15 +10,35 @@ Wearing the glasses for every change is slow. The VDK has three tools so you mos
 
 ## The visor command
 
-### Set up
+### Install
 
-1. Install Java 17 or later and Android's platform tools (adb). Android Studio brings both.
-2. Download `visor-<version>.zip` from the [releases](https://github.com/macedonga/visor-kit/releases), unzip it,
-   and put its `bin` folder on your PATH. From a clone: `./gradlew :cli:installDist`, then use
-   `tools/cli/build/install/visor/bin/visor`.
-3. Connect the phone with adb, over USB or wireless debugging: `adb devices` must list it. With more than one
+The command needs Java 17 or later, and adb to reach a phone. Android Studio brings both.
+
+The fast way, one line that installs the latest release and puts `visor` on your PATH. Run it again to update.
+
+```
+curl -fsSL https://visor.macedonga.com/install.sh | sh          # macOS and Linux
+irm https://visor.macedonga.com/install.ps1 | iex               # Windows, in PowerShell
+```
+
+The script on macOS and Linux puts the command in `~/.visor` and starts it from `~/.local/bin/visor`; the one on
+Windows puts it in `%LOCALAPPDATA%isor` and adds its `bin` folder to your PATH. Both say so if Java is missing.
+
+The manual way:
+
+1. Download `visor-<version>.zip` from the [releases](https://github.com/macedonga/visor-kit/releases).
+2. Unzip it where you keep tools.
+3. Put its `bin` folder on your PATH.
+
+From a clone of visor-kit, `./gradlew :cli:installDist` builds it in `tools/cli/build/install/visor`.
+
+`visor --version` says which version you have.
+
+### Set up the phone
+
+1. Connect the phone with adb, over USB or wireless debugging: `adb devices` must list it. With more than one
    device, pick one with `visor -s SERIAL ...`.
-4. In Visor, turn on Developer mode, in Settings, Advanced settings, Tools. It opens the socket the command uses;
+2. In Visor, turn on Developer mode, in Settings, Advanced settings, Tools. It opens the socket the command uses;
    apps do not need it.
 
 `visor` finds adb through `ANDROID_HOME` or the PATH, forwards a free port to Visor's socket, and removes the
