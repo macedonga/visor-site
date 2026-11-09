@@ -78,18 +78,25 @@ const areas = [
   ["Web apps", "connectGlasses()", "web-apps", "All of it from JavaScript on the Display."],
 ];
 
-const cli = `
-$ visor status                  # Visor, the glasses, the band, your app
-$ visor trace                   # every call and event, live
-$ visor simulate band.gestures  # type "index double_tap", get it
-$ visor fake                    # no phone: a fake Visor and Display`;
+// What `visor fake` prints, as it prints it.
+const fakeRun = `
+$ visor fake
+FakeVisor on ws://127.0.0.1:7333/rpc and http://127.0.0.1:7333/mcp; visor --fake on port 7334. Type help.
+The Display simulator: http://127.0.0.1:7333/display`;
 
-const packages = [
-  ["com.macedonga.visor:kit", "Android"],
-  ["com.macedonga.visor:kit-testing", "FakeVisor for your app's tests"],
-  ["visor-kit on npm", "TypeScript, Node and the Display's browser"],
-  ["visor-kit on PyPI", "Python"],
-  ["visor", "The command for your computer"],
+const tools = [
+  ["visor simulate band.gestures", "Gestures without a band: type them, and your app gets them."],
+  ["visor trace", "Every call and event between your app and Visor, live."],
+  ["FakeVisor", "Visor inside your app's unit tests, with the same Display."],
+];
+
+const installs = [
+  ["Android", 'implementation("com.macedonga.visor:kit:0.1.0")'],
+  ["Android tests", 'testImplementation("com.macedonga.visor:kit-testing:0.1.0")'],
+  ["Python", "pip install visor-kit"],
+  ["TypeScript", "npm install visor-kit"],
+  ["visor on macOS and Linux", "curl -fsSL https://visor.macedonga.com/install.sh | sh"],
+  ["visor on Windows", "irm https://visor.macedonga.com/install.ps1 | iex"],
 ];
 
 const wrap = "mx-auto max-w-6xl px-4 sm:px-6";
@@ -148,29 +155,41 @@ const button = "inline-flex h-10 items-center rounded px-4 text-[15px] font-medi
   </section>
 
   <section class:list={[wrap, "pb-20 md:pb-28"]} aria-labelledby="testing-title">
-    <h2 id="testing-title" class:list={[h2, "mb-8"]}>Test without the glasses</h2>
-    <div class="grid items-center gap-6 lg:grid-cols-[minmax(0,1fr)_15rem]">
-      <div class="on-panel overflow-hidden rounded-md bg-panel ring-1 ring-white/10">
-        <Code code={cli.trim()} lang="sh" themes={themes} defaultColor={false} class="!p-5" />
+    <h2 id="testing-title" class:list={[h2, "mb-10"]}>Test without the glasses</h2>
+    <!-- One command, and the simulator it serves: the real output and the real page. -->
+    <div class="relative">
+      <figure class="m-0 overflow-hidden rounded-md bg-[#17181c] shadow-xl ring-1 ring-white/10 lg:ml-[24%]">
+        <div class="border-b border-white/10 px-4 py-2.5 font-mono text-xs text-white/50">127.0.0.1:7333/display</div>
+        <img src="/shots/simulator.webp" width="1600" height="1317" loading="lazy" class="block h-auto w-full"
+          alt="The Display simulator from visor fake: the Briefing with the two cards, and controls for the touchpad, the band and the view." />
+      </figure>
+      <div class="on-panel mt-4 overflow-hidden rounded-md bg-panel shadow-2xl ring-1 ring-white/10 lg:absolute lg:bottom-10 lg:left-0 lg:mt-0 lg:w-[44%]">
+        <div class="border-b border-white/10 px-4 py-2.5 font-mono text-xs text-white/50">Terminal</div>
+        <Code code={fakeRun.trim()} lang="console" themes={themes} defaultColor={false} class="!p-5" />
       </div>
-      <img src="/shots/detail.webp" width="640" height="640" loading="lazy"
-        alt="The kitchen timer's detail in the Display simulator: started 19:42, ends 19:52, and a Stop button."
-        class="aspect-square w-full max-w-60 rounded-[5.625%]" />
     </div>
-  </section>
-
-  <section class:list={[wrap, "grid gap-10 pb-20 md:pb-28 md:grid-cols-2"]} aria-labelledby="packages-title">
-    <div>
-      <h2 id="packages-title" class={h2}>Packages</h2>
-    </div>
-    <dl class="m-0 border-t border-line">
-      {packages.map(([name, what]) => (
-        <div class="grid grid-cols-[1fr_auto] gap-4 border-b border-line py-3 text-sm">
-          <dt><code class="text-[13px] break-all">{name}</code></dt>
-          <dd class="m-0 text-right text-muted">{what}</dd>
+    <dl class="m-0 mt-12 grid gap-8 border-t border-line pt-8 sm:grid-cols-3">
+      {tools.map(([name, what]) => (
+        <div>
+          <dt><code class="text-sm font-medium text-ink">{name}</code></dt>
+          <dd class="m-0 mt-1.5 text-muted">{what}</dd>
         </div>
       ))}
     </dl>
+  </section>
+
+  <section class:list={[wrap, "pb-20 md:pb-28"]} aria-labelledby="install-title">
+    <h2 id="install-title" class:list={[h2, "mb-8"]}>Install</h2>
+    <ul class="m-0 list-none divide-y divide-line rounded-md border border-line p-0">
+      {installs.map(([where, line]) => (
+        <li class="grid items-center gap-x-6 gap-y-1 px-4 py-3 sm:grid-cols-[12rem_minmax(0,1fr)_auto]">
+          <span class="text-sm text-muted">{where}</span>
+          <code class="text-sm break-all text-ink" data-line>{line}</code>
+          <button type="button" data-copy class="justify-self-start rounded-sm border border-line px-2 py-0.5 text-xs text-muted hover:text-ink sm:justify-self-end">Copy</button>
+        </li>
+      ))}
+    </ul>
+    <p class="mt-3 text-sm text-muted">The visor command needs Java 17 or later, which Android Studio brings.</p>
   </section>
 
   <section class="grid-paper border-t border-line">
@@ -183,3 +202,18 @@ const button = "inline-flex h-10 items-center rounded px-4 text-[15px] font-medi
     </div>
   </section>
 </Base>
+
+<script>
+  for (const button of document.querySelectorAll<HTMLButtonElement>("[data-copy]")) {
+    button.addEventListener("click", async () => {
+      const line = button.parentElement?.querySelector("[data-line]")?.textContent ?? "";
+      try {
+        await navigator.clipboard.writeText(line);
+        button.textContent = "Copied";
+      } catch {
+        button.textContent = "Copy failed";
+      }
+      setTimeout(() => (button.textContent = "Copy"), 1600);
+    });
+  }
+</script>
