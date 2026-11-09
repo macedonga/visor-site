@@ -9,7 +9,7 @@ Developer mode lets automations and the launcher work the glasses' camera throug
 
 ## Turn it on
 
-Open Settings, Advanced, and turn on **Developer mode** under Tools.
+Open Settings, Apps, and turn on **Developer mode** under Developers.
 
 The glasses take a photo for the phone only when a Meta switch, `wearables_robusta.demo_enabled`, is on. Developer mode turns it on, and turns it off again when you turn the mode off. If Visor has never read the glasses' configuration, it reads it first, which can take a minute over Bluetooth.
 

@@ -38,7 +38,7 @@ From a clone of visor-kit, `./gradlew :cli:installDist` builds it in `tools/cli/
 
 1. Connect the phone with adb, over USB or wireless debugging: `adb devices` must list it. With more than one
    device, pick one with `visor -s SERIAL ...`.
-2. In Visor, turn on Developer mode, in Settings, Advanced settings, Tools. It opens the socket the command uses;
+2. In Visor, turn on Developer mode, in Settings, Apps, Developers. It opens the socket the command uses;
    apps do not need it.
 
 `visor` finds adb through `ANDROID_HOME` or the PATH, forwards a free port to Visor's socket, and removes the

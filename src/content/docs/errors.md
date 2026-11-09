@@ -33,6 +33,6 @@ Some failures carry a `reason` that says what the person can change:
 |---|---|---|
 | `not_set_up` | `unsupported` | Set the band up in Visor's band settings: only the Display holds it now. |
 | `not_shared` | `unsupported` | Turn on Visor > Settings > Neural Band > Share with the phone, for `band.motion`. |
-| `not_allowed` | `refused` | Allow the web app in Visor > Settings > Web apps > the app > Visor access. |
+| `not_allowed` | `refused` | Allow the web app in Visor > Settings > Apps > the app > Visor access. |
 
 Visor adds codes and reasons over time. Treat a code you do not know as `failed`.

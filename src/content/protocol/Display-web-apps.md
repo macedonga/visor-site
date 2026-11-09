@@ -74,7 +74,7 @@ Each scan opens its own svc55074 channel.
 > [!IMPORTANT]
 > The browser lets a page scan only when its origin is in MobileConfig `web_on_hn.webapp_ble_scan_allowed_origins` (config 90969, param 66), or in the property `persist.experimental.web_on_hn_webapp_ble_scan_origins`, which wins when set. The value is a JSON array of origins, or a comma-separated list. Each is matched exactly: scheme, host and port. Any other page gets "This site is not allowed to scan for Bluetooth devices".
 
-Visor scans on the phone with the page's filters, in hardware where Android has a filter for them, and writes that MobileConfig value for the apps the person allows in **Settings > Web apps**. See [MobileConfig](MobileConfig). Not measured on the glasses yet.
+Visor scans on the phone with the page's filters, in hardware where Android has a filter for them, and writes that MobileConfig value for the apps the person allows in **Settings > Apps**. See [MobileConfig](MobileConfig). Not measured on the glasses yet.
 
 ## The VDK over scans
 
@@ -90,7 +90,7 @@ A page registers tools with `document.modelContext.registerTool` (the WebMCP dra
 
 The glasses' assistant runtime (`libassistantruntime.so`, `WebMcpRoutingGate`) answers such a turn on the glasses, unless MobileConfig `wearables_agentic_nova.forward_webmcp_requests_to_server` is on. Then it forces the turn to the server, which is the phone. The server can call the tools with ev311 `tools/call`, as it calls the Display's own tools. See [Assistant-protocol](Assistant-protocol).
 
-ev57 field 54 names the tools but gives no description or schema. Visor asks the glasses for them with an MCP `tools/list` on ev311. Whether the glasses answer `tools/list` is not checked. Visor turns both flags on from **Settings > Web apps**. Not measured on the glasses yet.
+ev57 field 54 names the tools but gives no description or schema. Visor asks the glasses for them with an MCP `tools/list` on ev311. Whether the glasses answer `tools/list` is not checked. Visor turns both flags on from **Settings > Apps**. Not measured on the glasses yet.
 
 ## Open questions
 

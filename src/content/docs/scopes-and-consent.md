@@ -60,8 +60,8 @@ it.
 
 ## Taking scopes back
 
-The person sees every app that holds scopes in Visor, under Settings, Advanced settings, Apps with access, and can
-remove an app's access there. When that happens:
+The person sees every app that holds scopes in Visor, under Settings, Apps, and can take back one scope or all of an
+app's access there. When that happens:
 
 - the app's open streams end with `scope_denied`;
 - its next calls fail the same way;
@@ -70,7 +70,7 @@ remove an app's access there. When that happens:
 ## Programs and web apps
 
 Programs on the [network door](network.md) and [web apps on the Display](web-apps.md) do not use the consent
-screen: the person picks their scopes in Visor, when they make a network client, or in Settings > Web apps for a
+screen: the person picks their scopes in Visor, when they make a network client, or in Settings > Apps for a
 web app. Their calls fail with `scope_denied` the same way, and taking a scope back ends their streams at once.
 
 ## Who an app is

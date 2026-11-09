@@ -15,7 +15,7 @@ async function start() {
     return await Visor.connectGlasses();
   } catch (e) {
     if (e instanceof VisorError && e.reason === "not_allowed") {
-      showMessage("Allow this app on your phone: Visor > Settings > Web apps > this app > Visor access.");
+      showMessage("Allow this app on your phone: Visor > Settings > Apps > this app > Visor access.");
     }
     throw e;
   }
@@ -31,7 +31,7 @@ them with the page's own code.
 
 ## What the person allows
 
-In Visor, **Settings > Web apps**, the person taps the app and picks what it may do under **Visor access**, one
+In Visor, **Settings > Apps**, the person taps the app and picks what it may do under **Visor access**, one
 scope at a time. That turns on **Nearby Bluetooth devices** for the app too, which is how it reaches Visor. The
 first time, Visor reads the glasses' configuration before it saves, which can take a minute; the sheet says so while
 it waits. The browser asks the wearer once more before the page's first connection.
@@ -79,7 +79,7 @@ document.modelContext.registerTool({
 });
 ```
 
-The person turns this on once, in Visor: **Settings > Web apps > Web app tools for your assistant**. Visor then
+The person turns this on once, in Visor: **Settings > Apps > Web app tools for your assistant**. Visor then
 hands the tools to the model the person set up in Visor, with their descriptions and schemas, and runs the calls the
 model makes. Give each tool a name that says what it does: the model reads it first. Without the setting,
 `document.modelContext` is missing: check for it before you register.

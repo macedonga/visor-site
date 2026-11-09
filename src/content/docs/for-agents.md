@@ -16,7 +16,7 @@ Access Toolkit (DAT): no Meta AI app, no Meta account, no developer centre. Port
 - Tests: `com.macedonga.visor:kit-testing` gives `FakeVisor` and `fake.connect()` in a plain JVM test.
 - Other languages: JSON-RPC over adb or Visor's network door; Python `visor_kit` and TypeScript clients.
 - A web app on the Display: the TypeScript client's `Visor.connectGlasses()`, guarded by `onGlasses()`. On a
-  `refused` with reason `not_allowed`, tell the person to allow the app in Visor > Settings > Web apps.
+  `refused` with reason `not_allowed`, tell the person to allow the app in Visor > Settings > Apps.
 
 ## Rules
 

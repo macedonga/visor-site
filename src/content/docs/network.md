@@ -5,15 +5,15 @@ until the person turns it on, and every client needs a token the person made for
 
 ## Turning it on
 
-In Visor, open Settings, Advanced settings, Network access:
+In Visor, open Settings, Apps, and find **Programs and agents**:
 
-1. Turn on **Open to clients**. Visor listens on `127.0.0.1:7333`, so only programs on the phone itself reach it
+1. Turn on **Let programs connect**. Visor listens on `127.0.0.1:7333`, so only programs on the phone itself reach it
    (Termux, for example).
 2. Turn on **From the local network** to let computers on the same Wi-Fi in too. The row shows the phone's address.
-3. **Add a client**: give it a name and its scopes. Visor shows the client's token once; copy it then. Visor keeps
+3. **Add a program**: give it a name and its scopes. Visor shows the program's token once; copy it then. Visor keeps
    only its hash.
 
-Remove a client to take its access back: its streams end at once.
+Remove a program to take its access back: its streams end at once.
 
 To reach the door from a computer without the local network, forward the port over adb:
 `adb forward tcp:7333 tcp:7333`.
@@ -48,7 +48,7 @@ glasses' capture light still turns on for each one.
 ## Webhooks
 
 For a service that cannot hold a connection open, such as a home automation hub, Visor can post events instead. When
-you add a client, give it a **webhook URL** and pick its topics: those its scopes allow, without params. While the
+you add a program, give it a **webhook URL** and pick its topics: those its scopes allow, without params. While the
 network door is open, Visor subscribes as that client and posts each event, in order, as JSON:
 
 ```json
