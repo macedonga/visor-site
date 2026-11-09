@@ -68,7 +68,7 @@ The stream command codes:
 | 3 | NO_ROUTE | No route to the stream |
 | 4 | OPEN_TO_ADVERTISE | Open to advertise |
 | 5 | CONNECT | Connect |
-| 0x80 | ADVERTISEMENT | Long form: a two-byte length, then up to 1024 bytes |
+| 0x80 | ADVERTISEMENT | Long form: `[0x80 or stream][0x80][length, 2 bytes][0x00]`, then length bytes, up to 1024. 5 + length in all. |
 
 ### The COMMAND frame collides with DataX
 
@@ -78,7 +78,9 @@ The transport measures every SDU before the protocol sees it. That measure treat
 - For stream 0 with LOST, `80 01`, the length is 4 + 1 = 5 bytes.
 - The reader takes 5 bytes, so it consumes 3 bytes of the next SDU, and the stream is out of step after that.
 
-The length rule alone cannot tell the two framings apart. Unconfirmed: whether the glasses ever send a COMMAND frame on a byte stream, and so whether the collision happens.
+The length rule alone cannot tell the two framings apart, and the collision happens. In a relay between the Display and the Neural Band, both devices send COMMAND frames on sub-stream 1 over LE. Read as DataX, `81 80` claimed 388 bytes, the reader swallowed the DATA frames that followed, and the link dropped on the next byte it could not frame (0x2f, 0x3e, 0x2e, 0x39), every few seconds.
+
+Visor reads bit 7 by session phase. Bare DataX crosses only in the handshake. Once both RequestEncryption and EnableEncryption have arrived, a first byte with bit 7 set starts a COMMAND frame: 2 bytes, or 5 + length when the code has bit 7 set. With that rule the relay held.
 
 ### Unpinned type bits
 

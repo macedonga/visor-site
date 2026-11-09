@@ -81,7 +81,7 @@ A COMMAND frame is two bytes in its basic form. The first byte is 0x80 ORed with
 | 3 | NO_ROUTE | No route to the stream |
 | 4 | OPEN_TO_ADVERTISE | Open to advertise |
 | 5 | CONNECT | Connect |
-| 0x80 | ADVERTISEMENT | Long form: two byte length, then up to 1024 bytes of payload |
+| 0x80 | ADVERTISEMENT | Long form: `[0x80 or stream][0x80][length, 2 bytes][0x00]`, then length bytes, up to 1024. 5 + length in all. |
 
 ### The COMMAND frame collision
 
@@ -107,15 +107,16 @@ sequenceDiagram
     Note over Phone: The next read starts inside the DATA frame
 ```
 
-The rule cannot tell the two framings apart from the first two bytes. The stream is then out of step. Unconfirmed: whether the glasses wait for bytes that never come, or whether the phone fails to frame the stream.
+The rule cannot tell the two framings apart from the first two bytes, and the phone fails to frame the stream. In a relay between the Display and the Neural Band, the long COMMAND `81 80` read as 388 bytes of DataX, and the link dropped a few seconds later on a byte it could not frame.
 
-A possible way out is to read bit 7 by session phase. Before encryption, bit 7 would mean DataX. After encryption, it would mean COMMAND. This is unconfirmed.
+Visor reads bit 7 by session phase. Before both RequestEncryption and EnableEncryption have arrived, bit 7 means DataX. After that, it means COMMAND: 2 bytes, or 5 + length for a long form. The relay held with this rule.
 
 Reference code: [Sdu.kt](https://github.com/macedonga/visor/blob/main/core/transport/src/main/kotlin/com/macedonga/visor/core/transport/Sdu.kt), [Header.kt](https://github.com/macedonga/visor/blob/main/core/protocol/src/main/kotlin/com/macedonga/visor/core/protocol/Header.kt), [Framing.kt](https://github.com/macedonga/visor/blob/main/core/protocol/src/main/kotlin/com/macedonga/visor/core/protocol/Framing.kt), [BluetoothLeTransport.kt](https://github.com/macedonga/visor/blob/main/core/transport/src/main/kotlin/com/macedonga/visor/core/transport/BluetoothLeTransport.kt)
 
 ## Open questions
 
-- Whether the glasses send COMMAND frames over RFCOMM, LE or TCP.
+- Whether the glasses send COMMAND frames over RFCOMM or TCP. Over LE they do, in a relay.
+- The byte order of a long COMMAND's length past 255. Every one measured was under 256.
 - What bit 6 of the DataX first byte does.
 - Whether other units publish the same RFCOMM service record.
 - Whether a DataX message ever arrives after encryption.
