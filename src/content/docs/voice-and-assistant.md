@@ -166,7 +166,8 @@ as a `ToolCall`; answer it with `answer` or `fail` within 15 seconds. The model 
 to the wearer from it, so say what happened, not how to say it.
 
 - **Names** start with a letter, then letters, digits, `_` or `-`, 40 at most. When two apps offer the same name,
-  the second one's gets a `_` added for the model; the app still receives its own name.
+  or an app offers a name Visor's own tools use (such as `call`), the later one gets a `_` added for the model; the
+  app still receives its own name.
 - **Schemas** are JSON Schema objects. Without one, the tool takes no arguments.
 - **Descriptions** are what the model goes by to choose a tool. Say what it does and when it applies.
 - Visor's diary records each call with the app's name and whether it worked.
