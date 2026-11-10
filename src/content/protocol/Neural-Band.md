@@ -156,7 +156,7 @@ The band takes one central. While the phone holds it, the Display can still reac
 
 The Meta app joins the band's endpoint to the Display's when it sets the pair up ("establishing direct connection between central and peripheral"). The Display has `persist.vendor.meta.atc.enable_relay=1` and an ATC `RelayManager` that takes such sub-streams, matches the advertised peer with its manifest, and starts its link to the band on them. Its leases then say RELAY, and the phone keeps its own band link: it reads the band's gestures and buzzes it while the Display uses the band too.
 
-Visor does this when the person turns on **Share with the phone** in the band settings. Not measured on the glasses yet.
+Visor does this when the person turns on **Share with the phone** in the band settings, and sends svc41109 SET_PREFERRED_LINK `{1 link: 1 relay, 2 direct; 2 the band's identity; 3 its key hint}` with RELAY while shared and DIRECT after. On firmware 72025890058000080 the Display's dumpsys then shows `Active link [RELAY]`. The band closes the phone's link every 2 min 54 s while shared, and the relay opens again within 3 s; why is not known.
 
 ### The EMG relay receiver
 

@@ -126,7 +126,7 @@ A relay joins two devices through a third, the phone.
 - `OPEN` (0): the device starts a link setup on the sub-stream at once, as on a new link. `OPEN_TO_ADVERTISE` (4): it waits and sends an `ADVERTISEMENT` first, which the relay passes on.
 - `LOST` (1), `REJECTED` (2) and `NO_ROUTE` (3) close it. `CONNECT` (5) goes to a device's own relay streams.
 - A command at 0x80 or above has a payload: `[0x80 | id][code][b1][b2][payload]`, where the payload length minus one is `((b1 & 3) << 8) | b2`, up to 1024 bytes. Bit 6 of the code marks a command a device may ignore.
-- Frames on a sub-stream are sent and read as they are. The link the relay shares with each device does not seal them. Type 00 frames carry the inner link setup (`Preamble::receivePlaintext`); which types the inner session uses after it is not checked.
+- Frames on a sub-stream are sent and read as they are. The link the relay shares with each device does not seal them. Type 00 frames carry the inner link setup in plaintext: `[stream][n][n + 1 bytes]` (libairshield `Substreams::frameSize`). A reader that knows only DATA and COMMAND frames breaks on the first one.
 
 So the two devices run a whole link inside, with its own handshake and keys, and the relay passes the frames without reading them. Visor's [SubstreamRelay.kt](https://github.com/macedonga/visor/blob/main/core/session/src/main/kotlin/com/macedonga/visor/core/session/SubstreamRelay.kt) does this for the Display and the band.
 
