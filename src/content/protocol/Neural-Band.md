@@ -68,7 +68,7 @@ Service 41109 (`bt_peer_connection`) on the Display pairs a band to it. The sequ
 5. The phone sends PAIR to the Display with the band's identity, its advertising address and its key hint. When the band and the Display already list each other, it sends CONNECT instead.
 6. The Display answers PAIRING_EVENT 0 when the band is paired.
 
-The key hint is a 4-byte salt and the first 8 bytes of `SHA-256(SHA-256(public key) || salt)`, where the public key is the 64-byte raw key.
+The key hint is a 4-byte salt and the first 8 bytes of `SHA-256(SHA-256(public key) || salt)`, where the public key is the 64-byte raw key. The high nibble of the salt's first byte is the salt's length minus one, so 3 for four bytes. The Display reads the length from that nibble, as AirShield's HintMatcher does: a hint with a random first byte matches no key.
 
 > [!CAUTION]
 > PAIR clears the Display's old bond with a band. A run that fails partway can leave the band paired to nothing.
@@ -84,9 +84,11 @@ When the band and the Display both run AirShield 0x11, the Display links the ban
 2. The phone installs a manifest that lists both devices, on the band first and then on the Display. See [the band's manifest](#the-bands-manifest).
 3. The Display's context awareness manager matches the band against its rules. While the glasses are worn, it sends NotifyLease on svc150 and connects to the band. No BLE bond is needed beforehand.
 
-On firmware 72025890058000080, the Display connects a band in its manifest by itself within 5 s of a svc41109 DISCONNECT.
+Its built-in rule `SmartGlasses -> Input (Low)` does this. The rule is on when MobileConfig `wearable_connectivity_device_features.cam_sg_to_input` or the setting `sg_emg_display_off` is true. Meta's MobileConfig sync turns `cam_sg_to_input` on, so a Display that never had it links a band only by a rule from the phone. The Display's dumpstate lists its rules, peers and leases under `ContextAwarenessManager`.
 
-svc151 (`cam_control`) adds rules. Message type 1 is a CamOverrideRule, sent on a channel the phone opens, with no answer awaited:
+On firmware 72025890058000080, the Display connects a band in its manifest by itself within a second of a svc41109 DISCONNECT.
+
+svc151 (`cam_control`) adds rules. Message type 1 is a CamOverrideRule, sent on a channel the phone opens:
 
 | Field | Content |
 |---|---|
@@ -95,7 +97,16 @@ svc151 (`cam_control`) adds rules. Message type 1 is a CamOverrideRule, sent on 
 | 3 lease | Scope state: 1 disconnected, 2 low, 3 medium, 4 high, 5 relay |
 | 4 ruleType | 0 temporary, 1 permanent |
 
-DeviceMatch is `{1 family (packed: 1 smart glasses, 6 input), 2 product id, 3 inUse, 4 activePower, 5 connectedToPhone, 6 onBody, 7 charging, 8 uniquePeer}`. The Meta app sends glasses with onBody true, the band with uniquePeer set to its key hint, a low lease and a temporary rule, when a band is moved to other glasses. What the rule changes was not measured: the Display above took the band back with and without it.
+DeviceMatch is `{1 family (packed: 1 smart glasses, 6 input), 2 product id, 3 inUse, 4 activePower, 5 connectedToPhone, 6 onBody, 7 charging, 8 uniquePeer}`. The family list must not be empty. uniquePeer is the peer's 12-byte key hint. The Display counts itself as smart glasses. The Meta app sends the glasses with onBody true, the band by its key hint, a low lease and a temporary rule, when a band is moved to other glasses.
+
+The Display answers with type 2, CamOverrideRuleAck `{1 the rule's 16-byte id}`, and the rule lasts until the Display restarts. A newer rule for the same peer replaces the older one, and the Display drops the band and links it again. It refuses a rule with error 2 when:
+
+- the rule is not temporary;
+- no peer matches the key hint ("Peer from OverrideRule not found");
+- the glasses part does not match the Display;
+- the lease is disconnected or lower.
+
+A rule does not switch off the built-in rule. With a relay rule in place, the Display keeps its direct link. After a DISCONNECT it waits about 20 s for a path through the phone, then links the band directly again.
 
 ### The band's manifest
 
@@ -132,7 +143,7 @@ Visor turns the IMU on for the VDK's `band.motion` while the band is shared. Not
 
 A svc7009 session on an app's link forwards the band's gestures while the band stays with the Display. See [Device-Access-Toolkit](Device-Access-Toolkit#forwarded-gestures).
 
-The Display does not relay svc52822 from the phone: a buzz sent on the phone's link to the Display answers `0xC001`. The Display's own haptics services are internal to it. To buzz the band, the phone needs its own band link. It takes the band with svc41109 DISCONNECT, buzzes it and gives it back with CONNECT. Meanwhile the Display has no band. On firmware 72025890058000080 this fails: the Display connects the band again within 5 s, before the phone reaches it.
+The Display does not relay svc52822 from the phone: a buzz sent on the phone's link to the Display answers `0xC001`. The Display's own haptics services are internal to it. To buzz the band, the phone needs its own band link. The band takes one central at a time. To take it, the phone sends a relay rule, then svc41109 DISCONNECT, and connects within the 20 s the Display waits. The band advertises service `fd5f` and Meta data `80 01 06 …` (product 1537) at a rotating private address, and the phone reaches it only at that address. To give it back, the phone sends a low rule and CONNECT. Meanwhile the Display has no band. Without the relay rule, firmware 72025890058000080 takes the band back within a second, before the phone reaches it.
 
 ### The relay: the Display reaches the band through the phone
 
