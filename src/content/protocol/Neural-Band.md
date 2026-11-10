@@ -76,6 +76,27 @@ The key hint is a 4-byte salt and the first 8 bytes of `SHA-256(SHA-256(public k
 > [!NOTE]
 > Meta's app skips svc41109 on pairs where its connection manager owns the band, and uses svc150 leases and the constellation manifest instead. The Display still serves svc41109 in full.
 
+### Pairing at AirShield 0x11
+
+When the band and the Display both run AirShield 0x11, the Display links the band itself:
+
+1. The phone owns the band and has a link to it.
+2. The phone installs a manifest that lists both devices, on the band first and then on the Display. See [the band's manifest](#the-bands-manifest).
+3. The Display's context awareness manager matches the band against its rules. While the glasses are worn, it sends NotifyLease on svc150 and connects to the band. No BLE bond is needed beforehand.
+
+On firmware 72025890058000080, the Display connects a band in its manifest by itself within 5 s of a svc41109 DISCONNECT.
+
+svc151 (`cam_control`) adds rules. Message type 1 is a CamOverrideRule, sent on a channel the phone opens, with no answer awaited:
+
+| Field | Content |
+|---|---|
+| 1 currentDevice | DeviceMatch for the glasses |
+| 2 peerDevice | DeviceMatch for the band |
+| 3 lease | Scope state: 1 disconnected, 2 low, 3 medium, 4 high, 5 relay |
+| 4 ruleType | 0 temporary, 1 permanent |
+
+DeviceMatch is `{1 family (packed: 1 smart glasses, 6 input), 2 product id, 3 inUse, 4 activePower, 5 connectedToPhone, 6 onBody, 7 charging, 8 uniquePeer}`. The Meta app sends glasses with onBody true, the band with uniquePeer set to its key hint, a low lease and a temporary rule, when a band is moved to other glasses. What the rule changes was not measured: the Display above took the band back with and without it.
+
 ### The band's manifest
 
 The band holds a [constellation manifest](Identity-and-trust#the-constellation-manifest) too, with the same messages as the glasses. They go on svc102 (`embconn_link_mgr_manifest`) when the band's AirShield version is 0x11 or higher, and on svc10 before that. The band and the Display hand a newer manifest to each other when both trust its authority.
@@ -111,7 +132,7 @@ Visor turns the IMU on for the VDK's `band.motion` while the band is shared. Not
 
 A svc7009 session on an app's link forwards the band's gestures while the band stays with the Display. See [Device-Access-Toolkit](Device-Access-Toolkit#forwarded-gestures).
 
-The Display does not relay svc52822 from the phone: a buzz sent on the phone's link to the Display answers `0xC001`. The Display's own haptics services are internal to it. To buzz the band, the phone needs its own band link. It takes the band with svc41109 DISCONNECT, buzzes it and gives it back with CONNECT. Meanwhile the Display has no band.
+The Display does not relay svc52822 from the phone: a buzz sent on the phone's link to the Display answers `0xC001`. The Display's own haptics services are internal to it. To buzz the band, the phone needs its own band link. It takes the band with svc41109 DISCONNECT, buzzes it and gives it back with CONNECT. Meanwhile the Display has no band. On firmware 72025890058000080 this fails: the Display connects the band again within 5 s, before the phone reaches it.
 
 ### The relay: the Display reaches the band through the phone
 

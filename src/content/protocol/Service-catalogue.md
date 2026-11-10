@@ -52,6 +52,7 @@ Each row has one status:
 | 101 | `0x0065` | `motion_activity_service` | documented | [Meta-Ray-Ban-Display](Meta-Ray-Ban-Display) |
 | 102 | `0x0066` | `embconn_link_mgr_manifest` | documented | [Neural-Band](Neural-Band#the-bands-manifest) |
 | 150 | `0x0096` | `conn_device_lease` | documented | [Neural-Band](Neural-Band) |
+| 151 | `0x0097` | `cam_control` | documented | [Neural-Band](Neural-Band#pairing-at-airshield-0x11) |
 | 1023 | `0x03ff` | `nabu` | seen | [Notifications-and-contacts](Notifications-and-contacts#service-1023) |
 | 1027 | `0x0403` | `miranda` | documented | [Motion-sensors](Motion-sensors): motion and speech |
 | 2000 | `0x07d0` | `media_capture_state` | documented | [Device-state-and-build-info](Device-state-and-build-info) |
@@ -152,7 +153,6 @@ The firmware tables name 272 more services. Nothing more is known about them.
 | 99 | `0x0063` | `insights_telemetry` |
 | 103 | `0x0067` | `experience_state` |
 | 104 | `0x0068` | `wearables_whatsapp_file_transfer` (new) |
-| 151 | `0x0097` | `cam_control` |
 | 200 | `0x00c8` | `runtime_ipc_transport` |
 | 201 | `0x00c9` | `smartglasses_voicenotes` |
 | 202 | `0x00ca` | `waffle_slam` (new) |
