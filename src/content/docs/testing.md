@@ -27,8 +27,10 @@ Windows puts it in `%LOCALAPPDATA%isor` and adds its `bin` folder to your PATH.
 The manual way:
 
 1. Download `visor-<version>.zip` from the [releases](https://github.com/macedonga/visor-kit/releases).
-2. Unzip it where you keep tools.
-3. Put its `bin` folder on your PATH.
+2. To check that visor-kit's release workflow built it, run
+   `gh attestation verify visor-<version>.zip -R macedonga/visor-kit`.
+3. Unzip it where you keep tools.
+4. Put its `bin` folder on your PATH.
 
 From a clone of visor-kit, `./gradlew :cli:installDist` builds it in `tools/cli/build/install/visor`.
 
