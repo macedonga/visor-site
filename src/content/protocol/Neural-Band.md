@@ -112,6 +112,8 @@ A rule does not switch off the built-in rule. With a relay rule in place, the Di
 
 The band holds a [constellation manifest](Identity-and-trust#the-constellation-manifest) too, with the same messages as the glasses. They go on svc102 (`embconn_link_mgr_manifest`) when the band's AirShield version is 0x11 or higher, and on svc10 before that. The band and the Display hand a newer manifest to each other when both trust its authority.
 
+A band with no manifest, such as one just reset, answers GET_MANIFEST_VERSION (4144) with `0xC004` instead of a version; svc10 on a band at 0x11 answers it with `0xD001`. The Meta app (AI 297, `ManifestManagerImpl.sendStoredManifestToDevices`) does not ask first: it opens a channel on the band's manifest service, sends SET_MANIFEST_AUTHORITY_KEY (4127) and then the file in 1024-byte pieces (4122, the last one 4126), and does not check the version after. It asks for the version only on a reconnect, and sends the manifest again only when the key salt differs. Measured on a reset band in issue #95, Visor 3.0.3.
+
 > [!WARNING]
 > Install a manifest under a new authority on the band first. The band refuses the Display's manifest when it does not know the authority, with `0xC004`, and does not connect to the Display until it has it.
 
