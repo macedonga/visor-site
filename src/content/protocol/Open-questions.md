@@ -117,6 +117,7 @@ This page collects what is not known about the protocol. The first section lists
 - Unknown: whether the glasses verify the receipt signatures. The glasses' check of the final receipt is not visible on the link. The phone reads only the acknowledgement and the status frames.
 - The lifetime of a FRLA is not known. A refusal from Meta is the only sign that a login has expired.
 - Unknown: whether any call needs the universe value `fb`. Setup uses only `ar`.
+- Unknown: whether glasses Meta never registered answer the identity request with no certificate in field 1 and a registration package in field 3. Meta's `pair_request` then refuses with "The parameter device_cert is required". The Meta app first registers such glasses with Meta: it sends field 3 to Meta, passes Meta's challenge to the glasses on svc36 type `0x4000`, sends their `0x4001` answer back to Meta, and installs the certificate Meta returns with `0x4002`.
 
 ### [Device state and build info](Device-state-and-build-info)
 

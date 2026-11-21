@@ -37,6 +37,10 @@ Values are text in the form the kind gives: `"true"`, `"3"`, `"1.5"`, or one of 
 setting back: `changes` then brings it with the new value and `pending` false. If the glasses keep the old value,
 `changes` brings the old value.
 
+Glasses with no settings store, such as audio-only ones, cannot report a setting back. There `value` is the firmware's
+default until an app or the person sets it, `set` returns the setting with the new value and `pending` false, and the
+settings only that store holds are not `writable`.
+
 | Failure | Code and reason |
 |---|---|
 | The key is not a setting Visor knows | `invalid_params`, `unknown_key` |
