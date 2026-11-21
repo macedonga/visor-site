@@ -27,7 +27,8 @@ A photo fails with:
 
 The glasses take a photo for the phone only while a switch of theirs is on. Visor turns it on while any app holds
 the `camera` scope. The first time, it can take a minute while Visor reads the glasses'
-configuration, and a photo asked for meanwhile fails with `timeout`.
+configuration, and a photo asked for meanwhile fails with `timeout`. Glasses whose configuration Visor cannot read,
+such as AirShield 16 firmware, keep the switch off: every photo fails with `timeout`, and videos still work.
 
 ## Videos
 
