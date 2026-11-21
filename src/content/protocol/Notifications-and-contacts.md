@@ -105,9 +105,9 @@ Unconfirmed: whether the glasses build their voice name model from this list aft
 
 Each contact is an object of type `contact`. Its uri is the phone's contact id. Its data is a FlexBuffers map with these keys: `name`, `nicknames`, `relationship`, `phoneNumbers`, `contactType`, `isFavorite`, `profilePictureUri`, `shareableEncryptedChatID`, `scoreSharedAt`, `isE2EE` and `groupParticipants`. The phone writes empty values for the keys it does not fill.
 
-`phoneNumbers` holds one entry per number. Each entry has five comma-separated fields: a type code, a calling code, a label, the number, and an empty fifth field. The entries are joined by semicolons.
+`phoneNumbers` holds one entry per number. Each entry has five comma-separated fields: the type, a calling code, the number, an empty field, and the label. The entries are joined by semicolons. The glasses dial the third field: with the label there, a call by name dials the label's letters as keypad digits.
 
-- Type codes: 0 work, 1 home, 2 mobile, 3 other.
+- Types: `WORK`, `HOME`, `CELL`, and `CUSTOM` for any other number.
 - The calling code is the E.164 prefix of the number. The codes 1 and 7 have one digit. These codes have two digits: 20 27 30 31 32 33 34 36 39 40 41 43 44 45 46 47 48 49 51 52 53 54 55 56 57 58 60 61 62 63 64 65 66 81 82 84 86 90 91 92 93 94 95 98. Other codes have three digits.
 
 The sync runs as follows:

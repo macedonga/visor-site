@@ -63,8 +63,10 @@ key = hashlib.sha256(token.encode()).hexdigest().encode()
 valid = hmac.compare_digest("sha256=" + hmac.new(key, body, hashlib.sha256).hexdigest(), signature)
 ```
 
-Visor waits 5 seconds for an answer and does not retry. When the receiver keeps failing, Visor's event log says so
-once a minute.
+Visor waits 5 seconds for an answer. It tries a failure that may pass (no connection, a 5xx or a 429) twice more, 2 and
+4 seconds later; a receiver that still fails gets one try per event until it takes one again. A slow answer can bring
+the same event twice, so drop a repeat by its `time`. When the receiver keeps failing, Visor's event log says so once a
+minute.
 
 ## Clients for other languages
 
