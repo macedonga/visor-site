@@ -88,6 +88,10 @@ The two tables go into one zip. The zip holds the directories `sessionless.data/
 > [!IMPORTANT]
 > The glasses compare the time stamp in the name with the last one they stored, read in their local time. A phone that writes the stamp in UTC can look hours old to them. Use the later of local time and UTC, and keep each stamp later than the one sent before. "Sent" is not "applied": the next bug report shows whether the values landed.
 
+## Reading the glasses' values
+
+The glasses' values come only in a bug report. The phone asks on svc7006 (`wearables_bug_reporter`), and the zip comes over airship namespace `bugreport`. The request's field 6 is `BugReportParams {1 mode, 2 flags}`. Mode 1 asks for a lite report: only the `mobileconfig/`, `ota/` and `settingsservice/` folders, about 355 KB in 10 seconds over Bluetooth. A full report is about 4 to 5 MB and takes minutes. AirShield 16 firmware ignores the mode and always sends the full report, with the MobileConfig files under `dumpstate/FS/data/misc/mobileconfig/`. Audio-only glasses answer svc7006 with `0xC001`.
+
 ## Params worth knowing
 
 Most params apply at once. A few make the glasses' assistant restart, such as changes to the voice ids. Glasses set up without Meta's app never get Meta's values and run on the firmware defaults, which can differ from what Meta serves.
