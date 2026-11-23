@@ -10,6 +10,7 @@
 - [Hardware and models](Glasses-hardware)
 - [Firmware](Firmware)
 - [Radios and links](Radios-and-links)
+- [With an iPhone](With-an-iPhone)
 - [Service catalogue](Service-catalogue)
 
 #### The link

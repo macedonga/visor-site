@@ -25,7 +25,7 @@ The phone runs bring-up once the link is ready. It runs again after the glasses 
 
 1. Open m0 and send the registration at type 1000, tagged with service 15. The body is field 1 (session string, "<epoch ms>-<uuid>"), field 2 (client uuid), field 3 ("<client>-m0") and field 4 (varint 2). Wait for type 1001.
 2. Open s0 and send the same registration at type 5000 with "<client>-s0" in field 3. Wait for type 5001.
-3. Declare seven companion resources on m0, in this order. Type 11 carries "<epoch ms>-<uuid>" in field 1. Types 1031 and 1038 carry a uuid in field 1. Type 1016 is empty. Type 1029 is the string "1". Types 1039 and 1032 carry a uuid in field 1.
+3. Declare seven companion resources on m0, in this order. Type 11 carries "<epoch ms>-<uuid>" in field 1; an iPhone sends type 10 instead, see [With-an-iPhone](With-an-iPhone#svc15). Types 1031 and 1038 carry a uuid in field 1. Type 1016 is empty. Type 1029 is the string "1". Types 1039 and 1032 carry a uuid in field 1.
 4. Announce a session on m0 with four NetEvents: ev265 (open), ev263 with field 4 = 1, ev263 with field 4 = 2, ev262 (close).
 5. The glasses now route "Hey Meta" to the phone.
 

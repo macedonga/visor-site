@@ -1,4 +1,4 @@
-This page collects what is not known about the protocol. The first section lists the gaps that matter most. The rest copies the open questions of every page, 189 in all.
+This page collects what is not known about the protocol. The first section lists the gaps that matter most. The rest copies the open questions of every page, 199 in all.
 
 > [!NOTE]
 > Each page keeps its own list at its end. This page is rebuilt from those lists, so edit the page, not this one.
@@ -47,6 +47,19 @@ This page collects what is not known about the protocol. The first section lists
 - Whether the phone's Wi-Fi Direct group address is always the same.
 - Whether the glasses ever send a COMMAND frame over RFCOMM.
 - Whether the 20 MHz width in the join has any effect.
+
+### [With an iPhone](With-an-iPhone)
+
+- Can an app outside team `HXH6UQBHD4` open External Accessory protocol 80 or 84?
+- Is an External Accessory session framed as RFCOMM is, `4 + length`?
+- Does an unbonded L2CAP open on PSM 128 fail?
+- Does a pairing made over LE give the Classic bond iAP2 needs, or must the user pair in the iPhone's settings?
+- What do 1521 and 1522 carry: a JSON object or a proto?
+- Does iOS launch the 1015 app silently, with an alert, or not at all?
+- With type 10 and no iAP2, MAP or ANCS link, do features fail or fall back to the phone app?
+- Can the phone set `sg_allow_mirrored_notifications`, which has no svc31 field?
+- Does the iPhone serve AVRCP cover art, and does Meta Ray-Ban Display show it after type 10?
+- Does Wi-Fi Aware pair with an iPhone, and which service name and port does it use?
 
 ### [Service catalogue](Service-catalogue)
 

@@ -19,7 +19,7 @@ Each row has one status:
 
 ## Services with known messages
 
-52 services have a page, or are known to be in use.
+53 services have a page, or are known to be in use.
 
 | Id | Hex | Name | Status | Page |
 |---|---|---|---|---|
@@ -46,6 +46,7 @@ Each row has one status:
 | 72 | `0x0048` | `smartglasses_translation` | documented | [Meta-Ray-Ban-Display](Meta-Ray-Ban-Display) |
 | 76 | `0x004c` | `wearables_ping` | documented | [Meta-Ray-Ban-Display](Meta-Ray-Ban-Display) |
 | 79 | `0x004f` | `constellationauth` | documented | [Device-Access-Toolkit](Device-Access-Toolkit#the-apps-link) |
+| 81 | `0x0051` | `btc_profiles_activation` | documented | [With-an-iPhone](With-an-iPhone#svc81-btc_profiles_activation) |
 | 87 | `0x0057` | `smartglasses_maps_persistent_store` | documented | [Display-maps-and-location](Display-maps-and-location) |
 | 89 | `0x0059` | `wearables_whatsapp_linking` | documented | [Display-internet](Display-internet) |
 | 100 | `0x0064` | `peer_build_info` | documented | [Device-state-and-build-info](Device-state-and-build-info) |
@@ -79,7 +80,7 @@ Each row has one status:
 
 ## Every other id
 
-The firmware tables name 272 more services. Nothing more is known about them.
+The firmware tables name 271 more services. Nothing more is known about them.
 
 <details>
 <summary>Show the 272 names</summary>
@@ -135,7 +136,6 @@ The firmware tables name 272 more services. Nothing more is known about them.
 | 77 | `0x004d` | `prototype_identity` |
 | 78 | `0x004e` | `nexus` |
 | 80 | `0x0050` | `events_debug` |
-| 81 | `0x0051` | `btc_profiles_activation` |
 | 82 | `0x0052` | `smartglasses_auth` |
 | 83 | `0x0053` | `mwa_speech_conversation` |
 | 84 | `0x0054` | `partner_app_bridge` |
