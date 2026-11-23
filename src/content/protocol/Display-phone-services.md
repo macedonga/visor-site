@@ -78,7 +78,7 @@ Service 11006 (`phone_book_sync`) asks for the call log too, as type 1 `{1 reque
 | 1 | Request id |
 | 2 | The call log as JSON text, a list of `{"cType":"CDEntryAdd","id":"<date ms>","entry":{...}}`. The entry has `id`, `cachedName`, `phoneNumber`, `type` (such as `MISSED`), `dateEpochMilliseconds` and `durationSeconds` |
 | 3 | Error: 0 OK, 1 no permission, 2 disabled |
-| 4 | OS: 1 Android, 2 iOS. With iOS the Display reads the phone book over PBAP instead |
+| 4 | OS: 1 Android, 2 iOS |
 
 > [!IMPORTANT]
 > Answering svc11006 alone does not fill the Phone app. Its recent calls come only from svc70 type 11.

@@ -44,11 +44,11 @@ The Display checks the link on three services. Each wants a short answer.
 
 ## App info for each app
 
-Each Display app asks who the phone is. It opens its own svc100 channel, sends type 1 GET_INFO with an empty body and waits 5 s for type 2 AppInfo. Without an answer, the app takes the phone for neither Android nor iOS.
+Each Display app asks who the phone is. It opens its own svc100 channel, sends type 1 GET_INFO with an empty body and waits 5 s for type 2 AppInfo. Without an answer, the app takes the phone for not Android: the assistant's images, for one, come at the iOS size.
 
 | AppInfo field | Content |
 |---|---|
-| 1 | Platform: 1 Android, 2 iOS |
+| 1 | Platform: 1 iOS, 2 Android |
 | 2 | Companion app version |
 | 3 | OS version, for Android the SDK level |
 | 4 | Phone manufacturer |
